@@ -2,15 +2,48 @@
   <Head title="Welcome">
     <link rel="preconnect" href="https://rsms.me/" />
   </Head>
-  <main class="container bg-background">
-    <h1>Welcome</h1>
-    <p>This is the welcome page.</p>
-  </main>
+
+  <div class="h-svh overflow-clip">
+    <header class="container relative z-[999999] mx-auto flex items-center justify-between px-12 pt-12 text-lg">
+      <div>
+        <img src="/logo.png" alt="" />
+      </div>
+      <div class="flex items-center gap-x-4">
+        <Link :href="route('login')">login</Link>
+        <Link class="rounded-full bg-gradient-to-r from-[#003332] from-[-10%] to-[#4FBBB9] px-6 py-2" :href="route('register')">Sign Up</Link>
+      </div>
+    </header>
+
+    <main class="relative flex flex-col items-start pt-12">
+      <Main />
+
+      <Lines />
+    </main>
+  </div>
+
+  <!-- Container for lines -->
+  <div class="absolute inset-0 grid grid-cols-12">
+    <!-- 12 Vertical Lines -->
+    <template v-for="i in 12" :key="i">
+      <div class="h-full w-[5px] bg-gradient-to-b from-black to-transparent opacity-10" />
+    </template>
+  </div>
 </template>
 
 <script setup lang="ts">
-  // Link
-  import { Head } from '@inertiajs/vue3';
-  import { onMounted } from 'vue';
-  onMounted(() => {});
+  import Lines from '@/components/website/Lines.vue';
+  import Main from '@/components/website/Main.vue';
+  import { Head, Link } from '@inertiajs/vue3';
+  import { onBeforeMount } from 'vue';
+
+  // remove dark class
+  onBeforeMount(() => {
+    const htmlElement = document.querySelector('html');
+    if (htmlElement) {
+      const classes = htmlElement.classList;
+      if (!classes.contains('dark')) {
+        classes.add('dark');
+      }
+    }
+  });
 </script>
