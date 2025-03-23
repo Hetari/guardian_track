@@ -9,8 +9,8 @@
         <img src="/logo.png" alt="" />
       </div>
       <div class="flex items-center gap-x-4">
-        <Link :href="route('login')">login</Link>
-        <Link class="rounded-full bg-gradient-to-r from-[#003332] from-[-10%] to-[#4FBBB9] px-6 py-2" :href="route('register')">Sign Up</Link>
+        <Link class="rounded-full bg-gradient-to-r from-[#003332] from-[-10%] to-[#4FBBB9] px-6 py-2" :href="route('login')">login</Link>
+        <!-- TODO: add register here -->
       </div>
     </header>
 
