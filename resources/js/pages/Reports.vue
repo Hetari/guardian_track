@@ -9,11 +9,11 @@
     <template v-for="circle in circles" :key="circle.name">
       <Link
         :href="`/reports/${circle.title.toLowerCase()}`"
-        class="mb-6 w-full select-none rounded-lg bg-[#191919] p-4 text-gray-600 transition-all duration-150 hover:scale-105 hover:bg-[#222] lg:mb-0"
+        class="group relative z-0 mb-6 w-full select-none rounded-lg bg-[#191919] p-4 transition-all duration-200 ease-in-out hover:bg-[#222] lg:mb-0"
       >
         <div class="h-full text-center">
           <img
-            class="pointer-events-none mb-8 inline-block size-20 rounded-full border-2 p-3.5"
+            class="pointer-events-none z-50 mb-8 inline-block size-20 rounded-full p-3.5"
             :class="{
               'bg-red-500 brightness-90': circle.accent === 'red',
               'bg-yellow-500 brightness-90': circle.accent === 'yellow',
@@ -21,21 +21,21 @@
             }"
             :src="circle.svg"
           />
-          <h2 class="title-font text-sm font-medium tracking-wider text-gray-100">{{ circle.title }}</h2>
+          <h2 class="title-font z-50 text-lg font-medium tracking-wider text-white transition-colors duration-200 ease-in-out group-hover:text-black">
+            {{ circle.title }}
+          </h2>
 
-          <div class="flex h-1/2 flex-col items-center justify-between">
-            <p class="leading-relaxed">
-              {{ circle.body }}
-            </p>
-            <span
-              class="m-6 h-1 w-14 rounded"
-              :class="{
-                'bg-red-500': circle.accent === 'red',
-                'bg-yellow-500': circle.accent === 'yellow',
-                'bg-green-500': circle.accent === 'green',
-              }"
-            />
-          </div>
+          <p class="z-[999999] pb-14 leading-relaxed text-gray-400 transition-colors duration-200 ease-in-out group-hover:text-gray-600">
+            {{ circle.body }}
+          </p>
+          <span
+            class="absolute bottom-8 left-1/2 -z-10 inline-block h-1 w-14 origin-top -translate-x-1/2 rounded transition-all duration-200 ease-in-out group-hover:bottom-0 group-hover:left-0 group-hover:size-full group-hover:-translate-x-0"
+            :class="{
+              'bg-red-500': circle.accent === 'red',
+              'bg-yellow-500': circle.accent === 'yellow',
+              'bg-green-500': circle.accent === 'green',
+            }"
+          />
         </div>
       </Link>
     </template>
@@ -49,19 +49,19 @@
     {
       svg: 'stolen.svg',
       title: 'Stolen',
-      body: 'If your product is stolen',
+      body: 'Report a stolen product',
       accent: 'red',
     },
     {
       svg: 'lost.svg',
       title: 'Lost',
-      body: 'If your product is lost',
+      body: 'Report a lost product',
       accent: 'yellow',
     },
     {
       svg: 'checked.svg',
       title: 'Report',
-      body: "Follow up on a report you've made",
+      body: 'Track your report status',
       accent: 'green',
     },
   ];
