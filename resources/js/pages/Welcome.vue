@@ -3,7 +3,7 @@
     <link rel="preconnect" href="https://rsms.me/" />
   </Head>
 
-  <div class="h-svh overflow-clip">
+  <div class="min-h-svh overflow-clip">
     <header class="container relative z-[999999] mx-auto flex items-center justify-between px-12 pt-12 text-lg">
       <div>
         <img src="/logo.png" alt="" />

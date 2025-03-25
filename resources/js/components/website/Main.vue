@@ -8,7 +8,7 @@
       </h1>
       <p class="flex items-center gap-x-4 text-2xl">
         <span class="block h-[1px] w-8 bg-white" />
-        With Guardian Track
+        Guardian Track
       </p>
     </div>
     <p class="mx-auto size-full max-w-sm place-content-center text-lg">

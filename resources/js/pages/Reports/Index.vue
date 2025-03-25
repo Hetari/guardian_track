@@ -60,7 +60,7 @@
     },
     {
       svg: 'checked.svg',
-      title: 'Report',
+      title: 'Status',
       body: 'Track your report status',
       accent: 'green',
     },
