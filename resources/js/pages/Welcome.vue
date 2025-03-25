@@ -11,7 +11,7 @@
       <div class="flex items-center gap-x-4">
         <Link class="rounded-full bg-gradient-to-r from-[#003332] from-[-10%] to-[#4FBBB9] px-6 py-2" :href="route('login')">login</Link>
 
-        <Link v-if="is_authenticated" class="rounded-full bg-[#222] px-6 py-2" :href="route('reports')">reports</Link>
+        <Link v-if="is_authenticated" class="rounded-full bg-[#222] px-6 py-2" :href="route('reports.index')">reports</Link>
         <!-- TODO: add register here -->
       </div>
     </header>

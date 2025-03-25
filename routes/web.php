@@ -10,10 +10,10 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::group(['middleware' => ['auth', 'verified']], function () {
-    Route::get('reports', function () {
+Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' => 'reports.'], function () {
+    Route::get('/', function () {
         return Inertia::render('Reports');
-    })->name('reports');
+    })->name('index');
 });
 
 // Admin routes
