@@ -10,6 +10,8 @@
       </div>
       <div class="flex items-center gap-x-4">
         <Link class="rounded-full bg-gradient-to-r from-[#003332] from-[-10%] to-[#4FBBB9] px-6 py-2" :href="route('login')">login</Link>
+
+        <Link v-if="is_authenticated" class="rounded-full bg-[#222] px-6 py-2" :href="route('reports')">reports</Link>
         <!-- TODO: add register here -->
       </div>
     </header>
@@ -36,6 +38,7 @@
   import { Head, Link } from '@inertiajs/vue3';
   import { onBeforeMount } from 'vue';
 
+  const { is_authenticated = false } = defineProps<{ is_authenticated: boolean }>();
   // remove dark class
   onBeforeMount(() => {
     const htmlElement = document.querySelector('html');
