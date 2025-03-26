@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LostItemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,9 +21,15 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' 
         return Inertia::render('Reports/Stolen');
     })->name('stolen');
 
-    Route::get('/lost', function () {
-        return Inertia::render('Reports/Lost');
-    })->name('lost');
+
+    Route::group(['prefix' => 'lost', 'as' => 'lost.'], function () {
+        Route::get('/', function () {
+            return Inertia::render('Reports/Lost');
+        })->name('index');
+
+        Route::post('/stolen-items', [LostItemController::class, 'store'])->name('store');
+    });
+
 
     Route::get('/status', function () {
         return Inertia::render('Reports/Status');

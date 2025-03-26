@@ -4,7 +4,7 @@
   </Head>
 
   <section class="body-font container mx-auto grid grid-cols-3 gap-10 py-24">
-    <h1 class="col-span-full text-9xl font-bold text-[#ddd]">Reports</h1>
+    <h1 class="col-span-full text-8xl font-bold text-[#ddd]">Reports</h1>
 
     <template v-for="circle in circles" :key="circle.name">
       <Link

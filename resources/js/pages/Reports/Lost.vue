@@ -1,150 +1,92 @@
 <script setup lang="ts">
-  import { AutoForm, AutoFormField } from '@/components/ui/auto-form';
+  import { AutoForm } from '@/components/ui/auto-form';
+  import { DependencyType } from '@/components/ui/auto-form/interface';
   import { Button } from '@/components/ui/button';
   import { toast } from '@/components/ui/toast';
-  import { h } from 'vue';
+  import { useForm } from '@inertiajs/vue3';
   import * as z from 'zod';
 
-  enum Sports {
-    Football = 'Football/Soccer',
-    Basketball = 'Basketball',
-    Baseball = 'Baseball',
-    Hockey = 'Hockey (Ice)',
-    None = "I don't like sports",
-  }
-
   const schema = z.object({
-    username: z
-      .string({
-        required_error: 'Username is required.',
-      })
-      .min(2, {
-        message: 'Username must be at least 2 characters.',
-      }),
-
-    password: z
-      .string({
-        required_error: 'Password is required.',
-      })
-      .min(8, {
-        message: 'Password must be at least 8 characters.',
-      }),
-
-    favouriteNumber: z.coerce
-      .number({
-        invalid_type_error: 'Favourite number must be a number.',
-      })
-      .min(1, {
-        message: 'Favourite number must be at least 1.',
-      })
-      .max(10, {
-        message: 'Favourite number must be at most 10.',
-      })
-      .default(1)
-      .optional(),
-
-    acceptTerms: z.boolean().refine((value) => value, {
-      message: 'You must accept the terms and conditions.',
-      path: ['acceptTerms'],
+    name: z.string().min(1, 'Name is required'),
+    email: z.string().email('Invalid email'),
+    serialCode: z.string().min(1, 'Serial code is required'),
+    lostDateTime: z.string().min(1, 'Loss date and time are required'),
+    phone: z.string().min(1, 'Phone number is required'),
+    country: z.string().min(1, 'Country is required'),
+    city: z.string().min(1, 'City is required'),
+    streetAddress: z.string().min(1, 'Street address is required'),
+    idCardImage: z.any(),
+    purchaseLocation: z.string().min(1, 'Purchase location is required'),
+    files: z.any(),
+    lostItemType: z.enum(['Bag', 'Shoe', 'Watch', 'Other'], {
+      errorMap: () => ({ message: 'Select a valid item type' }),
     }),
+  });
 
-    sendMeMails: z.boolean().optional(),
-
-    birthday: z.coerce.date().optional(),
-
-    color: z.enum(['red', 'green', 'blue']).optional(),
-
-    // Another enum example
-    marshmallows: z.enum(['not many', 'a few', 'a lot', 'too many']),
-
-    // Native enum example
-    sports: z.nativeEnum(Sports).describe('What is your favourite sport?'),
-
-    bio: z
-      .string()
-      .min(10, {
-        message: 'Bio must be at least 10 characters.',
-      })
-      .max(160, {
-        message: 'Bio must not be longer than 30 characters.',
-      })
-      .optional(),
-
-    customParent: z.string().optional(),
-
-    file: z.string().optional(),
+  const form = useForm({
+    name: '',
+    email: '',
+    serialCode: '',
+    lostDateTime: '',
+    phone: '',
+    country: '',
+    city: '',
+    streetAddress: '',
+    idCardImage: null,
+    purchaseLocation: '',
+    files: [],
+    lostItemType: '',
   });
 
   function onSubmit(values: Record<string, any>) {
-    toast({
-      title: 'You submitted the following values:',
-      description: h(
-        'pre',
-        { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' },
-        h('code', { class: 'text-white' }, JSON.stringify(values, null, 2)),
-      ),
+    form.post('/lost-items', {
+      preserveScroll: true,
+      onSuccess: () => {
+        toast({ title: 'Success', description: 'Report submitted successfully!' });
+      },
+      onError: (errors) => {
+        console.error(errors);
+        toast({ title: 'Error', description: 'Failed to submit report.' });
+      },
     });
   }
 </script>
 
 <template>
-  <AutoForm
-    class="w-2/3 space-y-6"
-    :schema="schema"
-    :field-config="{
-      password: {
-        label: 'Your secure password',
-        inputProps: {
-          type: 'password',
-          placeholder: '••••••••',
+  <section class="body-font container relative mx-auto py-24">
+    <h1 class="col-span-full pb-24 text-9xl font-bold text-[#ddd]">Lost Report</h1>
+
+    <AutoForm
+      class="grid grid-cols-3 gap-4"
+      :schema="schema"
+      :field-config="{
+        name: { inputProps: { type: 'text', placeholder: 'Name' } },
+        email: { inputProps: { type: 'email', placeholder: 'Email' } },
+        serialCode: { inputProps: { type: 'text', placeholder: 'Product Serial Code' } },
+        lostDateTime: { inputProps: { type: 'datetime-local' } },
+        phone: { inputProps: { type: 'tel', placeholder: 'Phone Number' } },
+        country: { inputProps: { type: 'text', placeholder: 'Country' } },
+        city: { inputProps: { type: 'text', placeholder: 'City' } },
+        streetAddress: { inputProps: { type: 'text', placeholder: 'Street Address' } },
+        idCardImage: { inputProps: { type: 'file' } },
+        purchaseLocation: { inputProps: { type: 'text', placeholder: 'Purchase Location' } },
+        files: { inputProps: { type: 'file', multiple: true } },
+        lostItemType: {
+          component: 'radio',
         },
-      },
-      favouriteNumber: {
-        description: 'Your favourite number between 1 and 10.',
-      },
-      acceptTerms: {
-        label: 'Accept terms and conditions.',
-        inputProps: {
-          required: true,
+      }"
+      :dependencies="[
+        {
+          sourceField: 'lostItemType',
+          type: DependencyType.SETS_OPTIONS,
+          targetField: 'lostItemType',
+          when: (sourceFieldValue) => sourceFieldValue === 'lostItemType',
+          options: ['Bag', 'Shoe', 'Watch', 'Other'],
         },
-      },
-
-      birthday: {
-        description: 'We need your birthday to send you a gift.',
-      },
-
-      sendMeMails: {
-        component: 'switch',
-      },
-
-      bio: {
-        component: 'textarea',
-      },
-
-      marshmallows: {
-        label: 'How many marshmallows fit in your mouth?',
-        component: 'radio',
-      },
-
-      file: {
-        label: 'Text file',
-        component: 'file',
-      },
-    }"
-    @submit="onSubmit"
-  >
-    <template #acceptTerms="slotProps">
-      <AutoFormField v-bind="slotProps" />
-      <div class="!mt-2 text-sm">I agree to the <button class="text-primary underline">terms and conditions</button>.</div>
-    </template>
-
-    <template #customParent="slotProps">
-      <div class="flex items-end space-x-2">
-        <AutoFormField v-bind="slotProps" class="w-full" />
-        <Button type="button"> Check </Button>
-      </div>
-    </template>
-
-    <Button type="submit"> Submit </Button>
-  </AutoForm>
+      ]"
+      @submit="onSubmit"
+    >
+      <Button class="col-span-full ml-auto w-32" type="submit"> Submit </Button>
+    </AutoForm>
+  </section>
 </template>
