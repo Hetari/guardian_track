@@ -29,10 +29,11 @@
     purchase_location: z.string().optional(),
   });
 
-  const form_ = useForm({
-    validationSchema: toTypedSchema(schema),
-  });
-  const { coords, form, fetchAddress } = useLocation(form_);
+  const { coords, fetchAddress, form } = useLocation(
+    useForm({
+      validationSchema: toTypedSchema(schema),
+    }),
+  );
 
   // values: Record<string, any>
   function onSubmit(values: Record<string, any>) {
@@ -56,12 +57,7 @@
       }
     });
 
-    router.visit('lost/lost-items', {
-      method: 'post',
-      data: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    router.post('lost/lost-items', formData, {
       onSuccess: () => {
         toast({
           title: 'Success',

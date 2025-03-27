@@ -26,6 +26,8 @@ class LostItemController extends Controller
             'street_address' => 'required|string',
         ]);
 
+        dd($validated);
+
         if ($request->hasFile('id_card_image')) {
             $validated['id_card_image'] = $request->file('id_card_image')->store('uploads', 'public');
         }
