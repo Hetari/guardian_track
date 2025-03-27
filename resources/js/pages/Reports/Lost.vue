@@ -1,35 +1,39 @@
 <script setup lang="ts">
-  import { AutoForm } from '@/components/ui/auto-form';
+  import { AutoForm, AutoFormLabel } from '@/components/ui/auto-form';
   import { DependencyType } from '@/components/ui/auto-form/interface';
   import { Button } from '@/components/ui/button';
+  import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
   import { toast } from '@/components/ui/toast';
   import { router } from '@inertiajs/vue3';
   import { toTypedSchema } from '@vee-validate/zod';
   import { useForm } from 'vee-validate';
   import { z } from 'zod';
+  import { useLocation } from './useLocation';
 
   const schema = z.object({
     name: z.string().min(1, 'Name is required'),
     email: z.string().email('Invalid email'),
     serial_code: z.string().min(1, 'Serial code is required'),
-    lost_date_time: z.coerce.date().optional(),
+    lost_date_time: z.coerce.date(),
     phone: z.string().min(1, 'Phone number is required'),
     country: z.string().min(1, 'Country is required'),
     city: z.string().min(1, 'City is required'),
     street_address: z.string().min(1, 'Street address is required'),
     id_card_image: z.any().optional(),
-    purchase_location: z.string().min(1, 'Purchase location is required'),
     files: z.any().optional(),
     lost_item_type: z
       .enum(['Bag', 'Shoe', 'Watch', 'Other'], {
         errorMap: () => ({ message: 'Select a valid item type' }),
       })
       .default('Other'),
+    purchase_location: z.string().optional(),
   });
 
-  const form = useForm({
+  const form_ = useForm({
     validationSchema: toTypedSchema(schema),
   });
+
+  const { coords, form, fetchAddress } = useLocation(form_);
 
   // values: Record<string, any>
   function onSubmit(values: Record<string, any>) {
@@ -96,6 +100,7 @@
           inputProps: { type: 'text', placeholder: 'Enter the serial code' },
         },
         lost_date_time: {
+          // @ts-ignore
           label: 'Lost Date & Time',
           description: 'Specify when the item was lost.',
           inputProps: { type: 'datetime-local' },
@@ -116,10 +121,6 @@
           label: 'Street Address',
           inputProps: { type: 'text', placeholder: 'Enter your street address' },
         },
-        purchase_location: {
-          label: 'Purchase Location',
-          inputProps: { type: 'text', placeholder: 'Enter purchase location' },
-        },
         id_card_image: {
           label: 'Upload ID Card',
           description: 'Accepted formats: JPG, PNG, PDF.',
@@ -136,6 +137,7 @@
           label: 'Lost Item Type',
           description: 'Select the type of item you lost.',
         },
+        purchase_location: {},
       }"
       :dependencies="[
         {
@@ -148,6 +150,30 @@
       ]"
       @submit="onSubmit"
     >
+      <template #purchase_location="slotProps">
+        <div
+          @click="
+            () => {
+              fetchAddress(coords.latitude, coords.longitude, form);
+            }
+          "
+        >
+          <FormField :name="slotProps.fieldName">
+            <FormItem v-bind="$attrs">
+              <AutoFormLabel>Location </AutoFormLabel>
+
+              <FormControl>
+                <Button class="block h-10 w-full rounded-lg border border-input" type="button" variant="secondary" v-bind="slotProps"
+                  >Location</Button
+                >
+              </FormControl>
+
+              <!-- <FormDescription> Select the location where you purchased the item. </FormDescription> -->
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+      </template>
       <Button class="col-span-full ml-auto mt-4 w-32" type="submit"> Submit </Button>
     </AutoForm>
   </section>
