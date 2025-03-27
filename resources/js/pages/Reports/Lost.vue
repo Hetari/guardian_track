@@ -19,14 +19,15 @@
     country: z.string().min(1, 'Country is required'),
     city: z.string().min(1, 'City is required'),
     street_address: z.string().min(1, 'Street address is required'),
-    id_card_image: z.any().optional(),
-    files: z.any().optional(),
+    purchase_location: z.string().min(1, 'Purchase location is required'),
+    id_card_image: z.any().optional().default(null),
+    files: z.any().optional().default([]),
     lost_item_type: z
       .enum(['Bag', 'Shoe', 'Watch', 'Other'], {
         errorMap: () => ({ message: 'Select a valid item type' }),
       })
       .default('Other'),
-    purchase_location: z.string().optional(),
+    location: z.string().optional(),
   });
 
   const { coords, fetchAddress, form } = useLocation(
@@ -116,6 +117,10 @@
           label: 'Street Address',
           inputProps: { type: 'text', placeholder: 'Enter your street address' },
         },
+        purchase_location: {
+          label: 'Purchase Location',
+          inputProps: { type: 'text', placeholder: 'Enter the purchase location' },
+        },
         id_card_image: {
           label: 'Upload ID Card',
           description: 'Accepted formats: JPG, PNG, PDF.',
@@ -132,7 +137,7 @@
           label: 'Lost Item Type',
           description: 'Select the type of item you lost.',
         },
-        purchase_location: {},
+        location: {},
       }"
       :dependencies="[
         {
@@ -145,7 +150,7 @@
       ]"
       @submit="onSubmit"
     >
-      <template #purchase_location="slotProps">
+      <template #location="slotProps">
         <div
           @click="
             () => {
