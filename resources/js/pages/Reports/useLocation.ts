@@ -12,7 +12,7 @@ export function useLocation(form: any) {
 
   async function fetchAddress(lat: number, lon: number, form: any) {
     try {
-      const response = await axios.get(`https://nominatim.openstreetmap.org/reverse`, {
+      const response = await axios.get('https://nominatim.openstreetmap.org/reverse', {
         params: {
           lat,
           lon,
@@ -24,11 +24,9 @@ export function useLocation(form: any) {
       city.value = data.address.city || data.address.town || data.address.village || '';
       street_address.value = data.address.road || '';
 
-      form.setValues({
-        country: country.value,
-        city: city.value,
-        street_address: street_address.value,
-      });
+      form.setFieldValue('country', data.address.country || '');
+      form.setFieldValue('city', data.address.city || data.address.town || data.address.village || '');
+      form.setFieldValue('street_address', data.address.road || '');
     } catch (err) {
       console.error('Error fetching address:', err);
     }

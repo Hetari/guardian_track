@@ -32,7 +32,6 @@
   const form_ = useForm({
     validationSchema: toTypedSchema(schema),
   });
-
   const { coords, form, fetchAddress } = useLocation(form_);
 
   // values: Record<string, any>
