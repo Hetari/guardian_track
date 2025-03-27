@@ -36,20 +36,20 @@
     }),
   );
 
-  // values: Record<string, any>
   function onSubmit(values: Record<string, any>) {
     const formData = new FormData();
     Object.entries(values).forEach(([key, value]) => {
-      if (value === null || value === undefined) {
-        return;
-      }
+      if (value === null || value === undefined) return;
 
-      if (key === 'files' && Array.isArray(value) && value.length) {
+      if (key === 'files' && Array.isArray(value) && value.length > 0) {
         value.forEach((file) => {
-          formData.append('files[]', file);
+          if (file instanceof File) {
+            console.log(file);
+            formData.append('files[]', file, file.name);
+          }
         });
-      } else if (key === 'id_card_image' && value && value instanceof File) {
-        formData.append('id_card_image', value);
+      } else if (key === 'id_card_image' && value instanceof File) {
+        formData.append('id_card_image', value, value.name);
       } else if (key === 'lost_date_time' && value) {
         const formattedDate = new Date(value).toISOString().split('T')[0];
         formData.append('lost_date_time', formattedDate);
@@ -57,6 +57,8 @@
         formData.append(key, value);
       }
     });
+    // Debugging: Log form data
+    console.log([...formData.entries()]);
 
     router.post('lost/lost-items', formData, {
       onSuccess: () => {
