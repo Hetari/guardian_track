@@ -12,18 +12,19 @@ class LostItemController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'serialCode' => 'required|string',
-            'lostDateTime' => 'required|date',
-            'phone' => 'required|string',
-            'country' => 'required|string',
             'city' => 'required|string',
-            'streetAddress' => 'required|string',
-            'idCardImage' => 'nullable|file|mimes:jpg,png,pdf',
-            'purchaseLocation' => 'required|string',
+            'country' => 'required|string',
+            'email' => 'required|email',
             'files.*' => 'nullable|file|mimes:jpg,png,pdf',
+            // TODO: fix this validation rule
+            'idCardImage' => 'nullable|file|mimes:jpg,png,pdf',
+            'lostDateTime' => 'required|date|before:now',
             'lostItemType' => 'required|in:Bag,Shoe,Watch,Other',
+            'name' => 'required|string',
+            'phone' => 'required|string',
+            'purchaseLocation' => 'required|string',
+            'serialCode' => 'required|string',
+            'streetAddress' => 'required|string',
         ]);
 
         if ($request->hasFile('idCardImage')) {

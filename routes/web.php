@@ -27,7 +27,7 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' 
             return Inertia::render('Reports/Lost');
         })->name('index');
 
-        Route::post('/stolen-items', [LostItemController::class, 'store'])->name('store');
+        Route::post('/lost-items', [LostItemController::class, 'store'])->name('store');
     });
 
 
