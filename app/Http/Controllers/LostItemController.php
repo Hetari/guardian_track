@@ -16,19 +16,18 @@ class LostItemController extends Controller
             'country' => 'required|string',
             'email' => 'required|email',
             'files.*' => 'nullable|file|mimes:jpg,png,pdf',
-            // TODO: fix this validation rule
-            'idCardImage' => 'nullable|file|mimes:jpg,png,pdf',
-            'lostDateTime' => 'required|date|before:now',
-            'lostItemType' => 'required|in:Bag,Shoe,Watch,Other',
+            'id_card_image' => 'nullable|file|mimes:jpg,png,pdf',
+            'lost_date_time' => 'required|date|before:now',
+            'lost_item_type' => 'required|in:Bag,Shoe,Watch,Other',
             'name' => 'required|string',
             'phone' => 'required|string',
-            'purchaseLocation' => 'required|string',
-            'serialCode' => 'required|string',
-            'streetAddress' => 'required|string',
+            'purchase_location' => 'required|string',
+            'serial_code' => 'required|string',
+            'street_address' => 'required|string',
         ]);
 
-        if ($request->hasFile('idCardImage')) {
-            $validated['idCardImage'] = $request->file('idCardImage')->store('uploads', 'public');
+        if ($request->hasFile('id_card_image')) {
+            $validated['id_card_image'] = $request->file('id_card_image')->store('uploads', 'public');
         }
 
         if ($request->hasFile('files')) {

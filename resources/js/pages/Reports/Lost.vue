@@ -11,16 +11,16 @@
   const schema = z.object({
     name: z.string().min(1, 'Name is required'),
     email: z.string().email('Invalid email'),
-    serialCode: z.string().min(1, 'Serial code is required'),
-    lostDateTime: z.coerce.date().optional(),
+    serial_code: z.string().min(1, 'Serial code is required'),
+    lost_date_time: z.coerce.date().optional(),
     phone: z.string().min(1, 'Phone number is required'),
     country: z.string().min(1, 'Country is required'),
     city: z.string().min(1, 'City is required'),
-    streetAddress: z.string().min(1, 'Street address is required'),
-    idCardImage: z.any().optional(),
-    purchaseLocation: z.string().min(1, 'Purchase location is required'),
+    street_address: z.string().min(1, 'Street address is required'),
+    id_card_image: z.any().optional(),
+    purchase_location: z.string().min(1, 'Purchase location is required'),
     files: z.any().optional(),
-    lostItemType: z
+    lost_item_type: z
       .enum(['Bag', 'Shoe', 'Watch', 'Other'], {
         errorMap: () => ({ message: 'Select a valid item type' }),
       })
@@ -35,23 +35,23 @@
   function onSubmit(values: Record<string, any>) {
     const formData = new FormData();
     Object.entries(values).forEach(([key, value]) => {
-      if (key === 'files' && Array.isArray(value)) {
+      if (value === null || value === undefined) {
+        return;
+      }
+
+      if (key === 'files' && Array.isArray(value) && value.length) {
         value.forEach((file) => {
           formData.append('files[]', file);
         });
-      } else if (key === 'idCardImage' && value instanceof File) {
-        console.log(key, value);
-
-        formData.append('idCardImage', value);
-      } else if (key === 'lostDateTime' && value) {
+      } else if (key === 'id_card_image' && value && value instanceof File) {
+        formData.append('id_card_image', value);
+      } else if (key === 'lost_date_time' && value) {
         const formattedDate = new Date(value).toISOString().split('T')[0];
-        formData.append('lostDateTime', formattedDate);
+        formData.append('lost_date_time', formattedDate);
       } else {
         formData.append(key, value);
       }
     });
-
-    console.log(values);
 
     router.visit('lost/lost-items', {
       method: 'post',
@@ -91,11 +91,11 @@
           label: 'Email Address',
           inputProps: { type: 'email', placeholder: 'Enter your email' },
         },
-        serialCode: {
+        serial_code: {
           label: 'Product Serial Code',
           inputProps: { type: 'text', placeholder: 'Enter the serial code' },
         },
-        lostDateTime: {
+        lost_date_time: {
           label: 'Lost Date & Time',
           description: 'Specify when the item was lost.',
           inputProps: { type: 'datetime-local' },
@@ -112,18 +112,19 @@
           label: 'City',
           inputProps: { type: 'text', placeholder: 'Enter your city' },
         },
-        streetAddress: {
+        street_address: {
           label: 'Street Address',
           inputProps: { type: 'text', placeholder: 'Enter your street address' },
         },
-        purchaseLocation: {
+        purchase_location: {
           label: 'Purchase Location',
           inputProps: { type: 'text', placeholder: 'Enter purchase location' },
         },
-        idCardImage: {
+        id_card_image: {
           label: 'Upload ID Card',
           description: 'Accepted formats: JPG, PNG, PDF.',
           component: 'file',
+          inputProps: { accept: '.jpg,.png,.pdf' },
         },
         files: {
           label: 'Upload Files',
@@ -131,17 +132,17 @@
           component: 'file',
           inputProps: { multiple: true },
         },
-        lostItemType: {
+        lost_item_type: {
           label: 'Lost Item Type',
           description: 'Select the type of item you lost.',
         },
       }"
       :dependencies="[
         {
-          sourceField: 'lostItemType',
+          sourceField: 'lost_item_type',
           type: DependencyType.SETS_OPTIONS,
-          targetField: 'lostItemType',
-          when: (sourceFieldValue) => sourceFieldValue === 'lostItemType',
+          targetField: 'lost_item_type',
+          when: (sourceFieldValue) => sourceFieldValue === 'lost_item_type',
           options: ['Bag', 'Shoe', 'Watch', 'Other'],
         },
       ]"
