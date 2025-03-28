@@ -77,8 +77,8 @@
 
 <template>
   <div class="mt-2 hidden w-[340px] rounded-md bg-slate-950 p-4"></div>
-  <section class="body-font container relative mx-auto py-24">
-    <h1 class="col-span-full pb-24 text-9xl font-bold text-[#ddd]">Lost Report</h1>
+  <section class="body-font container relative mx-auto pt-24">
+    <h1 class="col-span-full pb-10 text-8xl font-bold text-[#ddd]">Lost Report</h1>
 
     <AutoForm
       class="grid grid-cols-3 gap-4"

@@ -17,9 +17,6 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' 
     Route::get('/', function () {
         return Inertia::render('Reports/Index');
     })->name('index');
-    Route::get('/stolen', function () {
-        return Inertia::render('Reports/Stolen');
-    })->name('stolen');
 
 
     Route::group(['prefix' => 'lost', 'as' => 'lost.'], function () {
@@ -28,6 +25,11 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' 
         })->name('index');
 
         Route::post('/lost-items', [LostItemController::class, 'store'])->name('store');
+    });
+    Route::group(['prefix' => 'stolen', 'as' => 'stolen.'], function () {
+        Route::get('/', function () {
+            return Inertia::render('Reports/Stolen');
+        })->name('index');
     });
 
 
