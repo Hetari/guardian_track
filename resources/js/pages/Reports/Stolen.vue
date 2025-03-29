@@ -14,7 +14,7 @@
     name: z.string().min(1, 'Name is required'),
     email: z.string().email('Invalid email'),
     serial_code: z.string().min(1, 'Serial code is required'),
-    lost_date_time: z.coerce.date(),
+    stolen_date_time: z.coerce.date(),
     phone: z.string().min(1, 'Phone number is required'),
     country: z.string().min(1, 'Country is required'),
     city: z.string().min(1, 'City is required'),
@@ -22,7 +22,7 @@
     purchase_location: z.string().min(1, 'Purchase location is required'),
     id_card_image: z.any().optional().default(null),
     files: z.any().optional().default([]),
-    lost_item_type: z
+    stolen_item_type: z
       .enum(['Bag', 'Shoe', 'Watch', 'Other'], {
         errorMap: () => ({ message: 'Select a valid item type' }),
       })
@@ -50,9 +50,9 @@
         });
       } else if (key === 'id_card_image' && value instanceof File) {
         formData.append('id_card_image', value, value.name);
-      } else if (key === 'lost_date_time' && value) {
+      } else if (key === 'stolen_date_time' && value) {
         const formattedDate = new Date(value).toISOString().split('T')[0];
-        formData.append('lost_date_time', formattedDate);
+        formData.append('stolen_date_time', formattedDate);
       } else {
         formData.append(key, value);
       }
@@ -60,7 +60,7 @@
     // Debugging: Log form data
     console.log([...formData.entries()]);
 
-    router.post('lost/lost-items', formData, {
+    router.post('stolen/stolen-items', formData, {
       onSuccess: () => {
         toast({
           title: 'Success',
@@ -97,10 +97,10 @@
           label: 'Product Serial Code',
           inputProps: { type: 'text', placeholder: 'Enter the serial code' },
         },
-        lost_date_time: {
+        stolen_date_time: {
           // @ts-ignore
-          label: 'Lost Date & Time',
-          description: 'Specify when the item was lost.',
+          label: 'Stolen Date & Time',
+          description: 'Specify when the item was stolen.',
           inputProps: { type: 'datetime-local' },
         },
         phone: {
@@ -135,18 +135,18 @@
           component: 'file',
           inputProps: { multiple: true },
         },
-        lost_item_type: {
-          label: 'Lost Item Type',
-          description: 'Select the type of item you lost.',
+        stolen_item_type: {
+          label: 'Stolen Item Type',
+          description: 'Select the type of item you stolen.',
         },
         location: {},
       }"
       :dependencies="[
         {
-          sourceField: 'lost_item_type',
+          sourceField: 'stolen_item_type',
           type: DependencyType.SETS_OPTIONS,
-          targetField: 'lost_item_type',
-          when: (sourceFieldValue) => sourceFieldValue === 'lost_item_type',
+          targetField: 'stolen_item_type',
+          when: (sourceFieldValue) => sourceFieldValue === 'stolen_item_type',
           options: ['Bag', 'Shoe', 'Watch', 'Other'],
         },
       ]"

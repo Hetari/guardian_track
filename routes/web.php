@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LostItemController;
+use App\Http\Controllers\StolenItemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -30,6 +31,7 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' 
         Route::get('/', function () {
             return Inertia::render('Reports/Stolen');
         })->name('index');
+        Route::post('/stolen-items', [StolenItemController::class, 'store'])->name('store');
     });
 
 
