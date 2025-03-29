@@ -1,14 +1,11 @@
 <?php
 
-use App\Http\Controllers\LostItemController;
-use App\Http\Controllers\StolenItemController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-
     $user = auth()->user();
-
     return Inertia::render('Welcome', [
         'is_authenticated' => $user ? true : false,
     ]);
@@ -19,21 +16,18 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' 
         return Inertia::render('Reports/Index');
     })->name('index');
 
+    Route::get('/lost', function () {
+        return Inertia::render("Reports/Lost");
+    })->name('lost');
+    Route::get('/stolen', function () {
+        return Inertia::render("Reports/Stolen");
+    })->name('stolen');
 
-    Route::group(['prefix' => 'lost', 'as' => 'lost.'], function () {
-        Route::get('/', function () {
-            return Inertia::render('Reports/Lost');
-        })->name('index');
 
-        Route::post('/lost-items', [LostItemController::class, 'store'])->name('store');
+    Route::group(['prefix' => 'items'], function () {
+        Route::post('/stolen', [ReportController::class, 'store'])->name('stolen.store');
+        Route::post('/lost', [ReportController::class, 'store'])->name('lost.store');
     });
-    Route::group(['prefix' => 'stolen', 'as' => 'stolen.'], function () {
-        Route::get('/', function () {
-            return Inertia::render('Reports/Stolen');
-        })->name('index');
-        Route::post('/stolen-items', [StolenItemController::class, 'store'])->name('store');
-    });
-
 
     Route::get('/status', function () {
         return Inertia::render('Reports/Status');

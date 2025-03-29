@@ -4,28 +4,24 @@
   import { Button } from '@/components/ui/button';
   import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
   import { Toaster } from '@/components/ui/toast';
-  import ToastAction from '@/components/ui/toast/ToastAction.vue';
-  import { useToast } from '@/components/ui/toast/use-toast';
   import { router } from '@inertiajs/vue3';
   import { toTypedSchema } from '@vee-validate/zod';
   import { useForm } from 'vee-validate';
-  import { h } from 'vue';
   import { z } from 'zod';
   import { useLocation } from './useLocation';
 
   const schema = z.object({
-    name: z.string().min(1, 'Name is required'),
+    product_name: z.string().min(1, 'Name is required'),
     email: z.string().email('Invalid email'),
     serial_code: z.string().min(1, 'Serial code is required'),
-    stolen_date_time: z.coerce.date(),
-    phone: z.string().min(1, 'Phone number is required'),
+    date_time: z.coerce.date(),
     country: z.string().min(1, 'Country is required'),
     city: z.string().min(1, 'City is required'),
     street_address: z.string().min(1, 'Street address is required'),
     purchase_location: z.string().min(1, 'Purchase location is required'),
     id_card_image: z.any().optional().default(null),
     files: z.any().optional().default([]),
-    stolen_item_type: z
+    item_type: z
       .enum(['Bag', 'Shoe', 'Watch', 'Other'], {
         errorMap: () => ({ message: 'Select a valid item type' }),
       })
@@ -39,9 +35,11 @@
     }),
   );
 
-  const { toast } = useToast();
+  // const { toast } = useToast();
   function onSubmit(values: Record<string, any>) {
     const formData = new FormData();
+    // formData.append('_method', 'POST');
+    formData.append('type', 'stolen');
     Object.entries(values).forEach(([key, value]) => {
       if (value === null || value === undefined) return;
 
@@ -54,9 +52,9 @@
         });
       } else if (key === 'id_card_image' && value instanceof File) {
         formData.append('id_card_image', value, value.name);
-      } else if (key === 'stolen_date_time' && value) {
+      } else if (key === 'date_time' && value) {
         const formattedDate = new Date(value).toISOString().split('T')[0];
-        formData.append('stolen_date_time', formattedDate);
+        formData.append('date_time', formattedDate);
       } else {
         formData.append(key, value);
       }
@@ -64,30 +62,30 @@
     // Debugging: Log form data
     console.log([...formData.entries()]);
 
-    router.post('stolen/stolen-items', formData, {
-      onSuccess: () => {
-        toast({
-          title: 'Success',
-          description: 'Report submitted successfully!',
-        });
-        form.resetForm();
-      },
-      onError: (errors) => {
-        console.error(errors);
-        toast({
-          title: 'Error',
-          description: 'Failed to submit report.',
-          action: h(
-            ToastAction,
-            {
-              altText: 'Try again',
-            },
-            {
-              default: () => form.submit(),
-            },
-          ),
-        });
-      },
+    router.post('items/stolen', formData, {
+      // onSuccess: () => {
+      //   toast({
+      //     title: 'Success',
+      //     description: 'Report submitted successfully!',
+      //   });
+      //   form.resetForm();
+      // },
+      // onError: (errors) => {
+      //   console.error(errors);
+      //   toast({
+      //     title: 'Error',
+      //     description: 'Failed to submit report.',
+      //     action: h(
+      //       ToastAction,
+      //       {
+      //         altText: 'Try again',
+      //       },
+      //       {
+      //         default: () => form.submit(),
+      //       },
+      //     ),
+      //   });
+      // },
     });
   }
 </script>
@@ -104,8 +102,8 @@
       :schema="schema"
       :form="form"
       :field-config="{
-        name: {
-          label: 'Full Name',
+        product_name: {
+          label: 'Product Name',
           inputProps: { type: 'text', placeholder: 'Enter your name' },
         },
         email: {
@@ -116,15 +114,11 @@
           label: 'Product Serial Code',
           inputProps: { type: 'text', placeholder: 'Enter the serial code' },
         },
-        stolen_date_time: {
+        date_time: {
           // @ts-ignore
           label: 'Stolen Date & Time',
           description: 'Specify when the item was stolen.',
           inputProps: { type: 'datetime-local' },
-        },
-        phone: {
-          label: 'Phone Number',
-          inputProps: { type: 'tel', placeholder: 'Enter your phone number' },
         },
         country: {
           label: 'Country',
@@ -154,7 +148,7 @@
           component: 'file',
           inputProps: { multiple: true },
         },
-        stolen_item_type: {
+        item_type: {
           label: 'Stolen Item Type',
           description: 'Select the type of item you stolen.',
         },
@@ -162,10 +156,10 @@
       }"
       :dependencies="[
         {
-          sourceField: 'stolen_item_type',
+          sourceField: 'item_type',
           type: DependencyType.SETS_OPTIONS,
-          targetField: 'stolen_item_type',
-          when: (sourceFieldValue) => sourceFieldValue === 'stolen_item_type',
+          targetField: 'item_type',
+          when: (sourceFieldValue) => sourceFieldValue === 'item_type',
           options: ['Bag', 'Shoe', 'Watch', 'Other'],
         },
       ]"

@@ -18,7 +18,6 @@
     email: z.string().email('Invalid email'),
     serial_code: z.string().min(1, 'Serial code is required'),
     lost_date_time: z.coerce.date(),
-    phone: z.string().min(1, 'Phone number is required'),
     country: z.string().min(1, 'Country is required'),
     city: z.string().min(1, 'City is required'),
     street_address: z.string().min(1, 'Street address is required'),
@@ -120,10 +119,7 @@
           description: 'Specify when the item was lost.',
           inputProps: { type: 'datetime-local' },
         },
-        phone: {
-          label: 'Phone Number',
-          inputProps: { type: 'tel', placeholder: 'Enter your phone number' },
-        },
+
         country: {
           label: 'Country',
           inputProps: { type: 'text', placeholder: 'Enter your country' },
