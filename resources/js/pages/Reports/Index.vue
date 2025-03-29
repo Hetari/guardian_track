@@ -15,25 +15,25 @@
           <img
             class="pointer-events-none z-50 mb-8 inline-block size-20 rounded-full p-3.5"
             :class="{
-              'bg-red-500': circle.accent === 'red',
-              'bg-yellow-500': circle.accent === 'yellow',
-              'bg-green-500': circle.accent === 'green',
+              'bg-red-600': circle.accent === 'red',
+              'bg-yellow-600': circle.accent === 'yellow',
+              'bg-green-600': circle.accent === 'green',
             }"
             :src="circle.svg"
           />
-          <h2 class="title-font z-50 text-lg font-medium tracking-wider text-white transition-colors duration-200 ease-in-out group-hover:text-black">
+          <h2 class="title-font z-50 text-lg font-medium tracking-wider text-white transition-colors duration-200 ease-in-out">
             {{ circle.title }}
           </h2>
 
-          <p class="z-[999999] pb-14 leading-relaxed text-gray-400 transition-colors duration-200 ease-in-out group-hover:text-gray-600">
+          <p class="z-[999999] pb-14 leading-relaxed text-gray-400 transition-colors duration-200 ease-in-out group-hover:text-gray-50">
             {{ circle.body }}
           </p>
           <span
             class="absolute bottom-8 left-1/2 -z-10 inline-block h-1 w-14 !origin-top -translate-x-1/2 rounded transition-all duration-200 ease-in-out group-hover:inset-x-0 group-hover:bottom-0 group-hover:size-full group-hover:-translate-x-0"
             :class="{
-              'bg-red-500': circle.accent === 'red',
-              'bg-yellow-500': circle.accent === 'yellow',
-              'bg-green-500': circle.accent === 'green',
+              'bg-red-600': circle.accent === 'red',
+              'bg-yellow-600': circle.accent === 'yellow',
+              'bg-green-600': circle.accent === 'green',
             }"
           />
         </div>
