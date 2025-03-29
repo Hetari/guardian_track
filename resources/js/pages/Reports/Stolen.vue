@@ -3,7 +3,7 @@
   import { DependencyType } from '@/components/ui/auto-form/interface';
   import { Button } from '@/components/ui/button';
   import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-  import { Toaster } from '@/components/ui/toast';
+  import { Toaster, useToast } from '@/components/ui/toast';
   import { router } from '@inertiajs/vue3';
   import { toTypedSchema } from '@vee-validate/zod';
   import { useForm } from 'vee-validate';
@@ -35,10 +35,10 @@
     }),
   );
 
-  // const { toast } = useToast();
+  const { toast } = useToast();
   function onSubmit(values: Record<string, any>) {
     const formData = new FormData();
-    // formData.append('_method', 'POST');
+    formData.append('_method', 'POST');
     formData.append('type', 'stolen');
     Object.entries(values).forEach(([key, value]) => {
       if (value === null || value === undefined) return;
@@ -59,33 +59,22 @@
         formData.append(key, value);
       }
     });
-    // Debugging: Log form data
-    console.log([...formData.entries()]);
 
     router.post('items/stolen', formData, {
-      // onSuccess: () => {
-      //   toast({
-      //     title: 'Success',
-      //     description: 'Report submitted successfully!',
-      //   });
-      //   form.resetForm();
-      // },
-      // onError: (errors) => {
-      //   console.error(errors);
-      //   toast({
-      //     title: 'Error',
-      //     description: 'Failed to submit report.',
-      //     action: h(
-      //       ToastAction,
-      //       {
-      //         altText: 'Try again',
-      //       },
-      //       {
-      //         default: () => form.submit(),
-      //       },
-      //     ),
-      //   });
-      // },
+      onSuccess: () => {
+        toast({
+          title: 'Success',
+          description: 'Report submitted successfully!',
+        });
+        form.resetForm();
+      },
+      onError: (errors) => {
+        console.error(errors);
+        toast({
+          title: 'Error',
+          description: 'Failed to submit report.',
+        });
+      },
     });
   }
 </script>

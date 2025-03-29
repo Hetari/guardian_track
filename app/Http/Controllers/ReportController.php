@@ -84,7 +84,8 @@ class ReportController extends Controller
             }
         }
 
-        return response()->json($report, 201);
+
+        return redirect()->back()->with('success', 'Lost item reported successfully.');
     }
 
     public function destroy($id)

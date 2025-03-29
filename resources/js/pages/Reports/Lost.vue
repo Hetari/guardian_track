@@ -3,28 +3,25 @@
   import { DependencyType } from '@/components/ui/auto-form/interface';
   import { Button } from '@/components/ui/button';
   import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-  import { toast } from '@/components/ui/toast';
-  import ToastAction from '@/components/ui/toast/ToastAction.vue';
-  import Toaster from '@/components/ui/toast/Toaster.vue';
+  import { Toaster, useToast } from '@/components/ui/toast';
   import { router } from '@inertiajs/vue3';
   import { toTypedSchema } from '@vee-validate/zod';
   import { useForm } from 'vee-validate';
-  import { h } from 'vue';
   import { z } from 'zod';
   import { useLocation } from './useLocation';
 
   const schema = z.object({
-    name: z.string().min(1, 'Name is required'),
+    product_name: z.string().min(1, 'Name is required'),
     email: z.string().email('Invalid email'),
     serial_code: z.string().min(1, 'Serial code is required'),
-    lost_date_time: z.coerce.date(),
+    date_time: z.coerce.date(),
     country: z.string().min(1, 'Country is required'),
     city: z.string().min(1, 'City is required'),
     street_address: z.string().min(1, 'Street address is required'),
     purchase_location: z.string().min(1, 'Purchase location is required'),
     id_card_image: z.any().optional().default(null),
     files: z.any().optional().default([]),
-    lost_item_type: z
+    item_type: z
       .enum(['Bag', 'Shoe', 'Watch', 'Other'], {
         errorMap: () => ({ message: 'Select a valid item type' }),
       })
@@ -38,8 +35,11 @@
     }),
   );
 
+  const { toast } = useToast();
   function onSubmit(values: Record<string, any>) {
     const formData = new FormData();
+    formData.append('_method', 'POST');
+    formData.append('type', 'lost');
     Object.entries(values).forEach(([key, value]) => {
       if (value === null || value === undefined) return;
 
@@ -52,17 +52,15 @@
         });
       } else if (key === 'id_card_image' && value instanceof File) {
         formData.append('id_card_image', value, value.name);
-      } else if (key === 'lost_date_time' && value) {
+      } else if (key === 'date_time' && value) {
         const formattedDate = new Date(value).toISOString().split('T')[0];
-        formData.append('lost_date_time', formattedDate);
+        formData.append('date_time', formattedDate);
       } else {
         formData.append(key, value);
       }
     });
-    // Debugging: Log form data
-    console.log([...formData.entries()]);
 
-    router.post('lost/lost-items', formData, {
+    router.post('items/lost', formData, {
       onSuccess: () => {
         toast({
           title: 'Success',
@@ -75,15 +73,6 @@
         toast({
           title: 'Error',
           description: 'Failed to submit report.',
-          action: h(
-            ToastAction,
-            {
-              altText: 'Try again',
-            },
-            {
-              default: () => form.submit(),
-            },
-          ),
         });
       },
     });
@@ -92,6 +81,7 @@
 
 <template>
   <Toaster />
+
   <div class="mt-2 hidden w-[340px] rounded-md bg-slate-950 p-4"></div>
   <section class="body-font container relative mx-auto pt-24">
     <h1 class="col-span-full pb-10 text-8xl font-bold text-[#ddd]">Lost Report</h1>
@@ -101,8 +91,8 @@
       :schema="schema"
       :form="form"
       :field-config="{
-        name: {
-          label: 'Full Name',
+        product_name: {
+          label: 'Product Name',
           inputProps: { type: 'text', placeholder: 'Enter your name' },
         },
         email: {
@@ -113,13 +103,12 @@
           label: 'Product Serial Code',
           inputProps: { type: 'text', placeholder: 'Enter the serial code' },
         },
-        lost_date_time: {
+        date_time: {
           // @ts-ignore
           label: 'Lost Date & Time',
           description: 'Specify when the item was lost.',
           inputProps: { type: 'datetime-local' },
         },
-
         country: {
           label: 'Country',
           inputProps: { type: 'text', placeholder: 'Enter your country' },
@@ -148,7 +137,7 @@
           component: 'file',
           inputProps: { multiple: true },
         },
-        lost_item_type: {
+        item_type: {
           label: 'Lost Item Type',
           description: 'Select the type of item you lost.',
         },
@@ -156,10 +145,10 @@
       }"
       :dependencies="[
         {
-          sourceField: 'lost_item_type',
+          sourceField: 'item_type',
           type: DependencyType.SETS_OPTIONS,
-          targetField: 'lost_item_type',
-          when: (sourceFieldValue) => sourceFieldValue === 'lost_item_type',
+          targetField: 'item_type',
+          when: (sourceFieldValue) => sourceFieldValue === 'item_type',
           options: ['Bag', 'Shoe', 'Watch', 'Other'],
         },
       ]"
