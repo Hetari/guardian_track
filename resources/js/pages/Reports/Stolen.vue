@@ -3,10 +3,13 @@
   import { DependencyType } from '@/components/ui/auto-form/interface';
   import { Button } from '@/components/ui/button';
   import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-  import { toast } from '@/components/ui/toast';
+  import { Toaster } from '@/components/ui/toast';
+  import ToastAction from '@/components/ui/toast/ToastAction.vue';
+  import { useToast } from '@/components/ui/toast/use-toast';
   import { router } from '@inertiajs/vue3';
   import { toTypedSchema } from '@vee-validate/zod';
   import { useForm } from 'vee-validate';
+  import { h } from 'vue';
   import { z } from 'zod';
   import { useLocation } from './useLocation';
 
@@ -36,6 +39,7 @@
     }),
   );
 
+  const { toast } = useToast();
   function onSubmit(values: Record<string, any>) {
     const formData = new FormData();
     Object.entries(values).forEach(([key, value]) => {
@@ -66,16 +70,31 @@
           title: 'Success',
           description: 'Report submitted successfully!',
         });
+        form.resetForm();
       },
       onError: (errors) => {
         console.error(errors);
-        toast({ title: 'Error', description: 'Failed to submit report.' });
+        toast({
+          title: 'Error',
+          description: 'Failed to submit report.',
+          action: h(
+            ToastAction,
+            {
+              altText: 'Try again',
+            },
+            {
+              default: () => form.submit(),
+            },
+          ),
+        });
       },
     });
   }
 </script>
 
 <template>
+  <Toaster />
+
   <div class="mt-2 hidden w-[340px] rounded-md bg-slate-950 p-4"></div>
   <section class="body-font container relative mx-auto pt-24">
     <h1 class="col-span-full pb-10 text-8xl font-bold text-[#ddd]">Stolen Report</h1>
