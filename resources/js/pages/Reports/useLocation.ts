@@ -1,6 +1,6 @@
 import { tryOnMounted, useGeolocation } from '@vueuse/core';
 import axios from 'axios';
-import { ref } from 'vue';
+import { ref, toRef } from 'vue';
 
 export function useLocation(form: any) {
   const { coords } = useGeolocation();
@@ -8,7 +8,10 @@ export function useLocation(form: any) {
   const error = ref<string | null>(null);
 
   async function fetchAddress(lat: number, lon: number, form: any) {
-    const { country, city, streetAddress } = form;
+    const country = toRef(form.country);
+    const city = toRef(form.city);
+    const streetAddress = toRef(form.streetAddress);
+
     try {
       const response = await axios.get('https://nominatim.openstreetmap.org/reverse', {
         params: {
@@ -29,7 +32,7 @@ export function useLocation(form: any) {
         streetAddress.value = data.address.road;
       }
     } catch (err) {
-      console.error('Error fetching address:', err);
+      console.error(err);
     }
   }
 

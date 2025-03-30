@@ -30,7 +30,25 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' 
     });
 
     Route::get('/status', function () {
-        return Inertia::render('Reports/Status');
+        $reports = auth()->user()
+            ->reports()
+            ->select(
+                'id',
+                'type',
+                'product_name',
+                'serial_code',
+                'date_time',
+                'country',
+                'city',
+                'street_address',
+                'purchase_location',
+                'item_type',
+                'status'
+            )
+            ->get();
+        return Inertia::render('Reports/Status', [
+            'reports' => $reports,
+        ]);
     })->name('status');
 });
 

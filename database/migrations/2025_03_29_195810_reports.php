@@ -21,7 +21,6 @@ return new class extends Migration
             $table->enum('type', ['stolen', 'lost']);
             $table->string('product_name');
             $table->string('serial_code');
-            $table->text('location')->nullable();
             $table->dateTime('date_time');
             $table->string('country');
             $table->string('city');

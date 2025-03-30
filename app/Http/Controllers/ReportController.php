@@ -23,7 +23,6 @@ class ReportController extends Controller
             'type' => 'required|in:stolen,lost',
             'product_name' => 'required|string|max:255',
             'serial_code' => 'required|string',
-            'location' => 'nullable|string',
             'files.*' => 'nullable|file|mimes:jpg,png,pdf',
             // 'id_card_image' => 'nullable|file|mimes:jpg,png,pdf',
             'id_card_image' => 'nullable|file|mimes:jpg,png,pdf',
