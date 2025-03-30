@@ -18,6 +18,7 @@ class Report extends Model
         'street_address',
         'purchase_location',
         'item_type',
+
     ];
 
     public function user()

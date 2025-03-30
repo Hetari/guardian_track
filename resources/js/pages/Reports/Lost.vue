@@ -1,79 +1,84 @@
 <script setup lang="ts">
-  import { AutoForm, AutoFormLabel } from '@/components/ui/auto-form';
-  import { DependencyType } from '@/components/ui/auto-form/interface';
   import { Button } from '@/components/ui/button';
-  import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-  import { Toaster, useToast } from '@/components/ui/toast';
+  import DatePicker from '@/components/ui/DatePicker.vue';
+  import { Input } from '@/components/ui/input';
+  import { Label } from '@/components/ui/label';
+  import { Select } from '@/components/ui/select';
+  import SelectContent from '@/components/ui/select/SelectContent.vue';
+  import SelectGroup from '@/components/ui/select/SelectGroup.vue';
+  import SelectItem from '@/components/ui/select/SelectItem.vue';
+  import SelectTrigger from '@/components/ui/select/SelectTrigger.vue';
+  import SelectValue from '@/components/ui/select/SelectValue.vue';
+  import { toast } from '@/components/ui/toast';
+  import Toaster from '@/components/ui/toast/Toaster.vue';
   import { router } from '@inertiajs/vue3';
-  import { toTypedSchema } from '@vee-validate/zod';
-  import { useForm } from 'vee-validate';
-  import { z } from 'zod';
+  import { DateValue } from 'reka-ui';
+  import { ref } from 'vue';
   import { useLocation } from './useLocation';
 
-  const schema = z.object({
-    product_name: z.string().min(1, 'Name is required'),
-    email: z.string().email('Invalid email'),
-    serial_code: z.string().min(1, 'Serial code is required'),
-    date_time: z.coerce.date(),
-    country: z.string().min(1, 'Country is required'),
-    city: z.string().min(1, 'City is required'),
-    street_address: z.string().min(1, 'Street address is required'),
-    purchase_location: z.string().min(1, 'Purchase location is required'),
-    id_card_image: z.any().optional().default(null),
-    files: z.any().optional().default([]),
-    item_type: z
-      .enum(['Bag', 'Shoe', 'Watch', 'Other'], {
-        errorMap: () => ({ message: 'Select a valid item type' }),
-      })
-      .default('Other'),
-    location: z.string().optional(),
+  const productName = ref('');
+  const email = ref('');
+  const serialCode = ref('');
+  const dateTime = ref<DateValue | undefined>();
+  const country = ref('');
+  const city = ref('');
+  const streetAddress = ref('');
+  const purchaseLocation = ref('');
+  const itemType = ref('');
+  const idCardImage = ref<File | null>(null);
+  const files = ref<File[]>([]);
+
+  const { coords, fetchAddress } = useLocation({
+    country,
+    city,
+    streetAddress,
   });
 
-  const { coords, fetchAddress, form } = useLocation(
-    useForm({
-      validationSchema: toTypedSchema(schema),
-    }),
-  );
+  function handleIdCardImage(e: Event) {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files[0]) {
+      idCardImage.value = target.files[0];
+    }
+  }
+  function handleFiles(e: Event) {
+    const target = e.target as HTMLInputElement;
+    if (target.files) {
+      // Convert FileList to an Array
+      files.value = Array.from(target.files);
+    }
+  }
 
-  const { toast } = useToast();
-  function onSubmit(values: Record<string, any>) {
+  async function handleSubmit() {
     const formData = new FormData();
-    formData.append('_method', 'POST');
     formData.append('type', 'lost');
-    Object.entries(values).forEach(([key, value]) => {
-      if (value === null || value === undefined) return;
+    formData.append('product_name', productName.value);
+    formData.append('email', email.value);
+    formData.append('serial_code', serialCode.value);
+    formData.append('item_type', itemType.value);
+    formData.append('date_time', dateTime.value ? dateTime.value.toString() : '');
+    formData.append('country', country.value);
+    formData.append('city', city.value);
+    formData.append('street_address', streetAddress.value);
+    formData.append('purchase_location', purchaseLocation.value);
 
-      if (key === 'files' && Array.isArray(value) && value.length > 0) {
-        value.forEach((file) => {
-          if (file instanceof File) {
-            console.log(file);
-            formData.append('files[]', file, file.name);
-          }
-        });
-      } else if (key === 'id_card_image' && value instanceof File) {
-        formData.append('id_card_image', value, value.name);
-      } else if (key === 'date_time' && value) {
-        const formattedDate = new Date(value).toISOString().split('T')[0];
-        formData.append('date_time', formattedDate);
-      } else {
-        formData.append(key, value);
-      }
+    if (idCardImage.value) {
+      formData.append('id_card_image', idCardImage.value, idCardImage.value.name);
+    }
+    files.value.forEach((file) => {
+      formData.append('files[]', file, file.name);
     });
 
     router.post('items/lost', formData, {
+      preserveState: true,
       onSuccess: () => {
         toast({
           title: 'Success',
           description: 'Report submitted successfully!',
         });
-        form.resetForm();
       },
       onError: (errors) => {
         console.error(errors);
-        toast({
-          title: 'Error',
-          description: 'Failed to submit report.',
-        });
+        toast({ title: 'Error', description: 'Failed to submit report.' });
       },
     });
   }
@@ -86,99 +91,85 @@
   <section class="body-font container relative mx-auto pt-24">
     <h1 class="col-span-full pb-10 text-8xl font-bold text-[#ddd]">Lost Report</h1>
 
-    <AutoForm
-      class="grid grid-cols-3 gap-4"
-      :schema="schema"
-      :form="form"
-      :field-config="{
-        product_name: {
-          label: 'Product Name',
-          inputProps: { type: 'text', placeholder: 'Enter your name' },
-        },
-        email: {
-          label: 'Email Address',
-          inputProps: { type: 'email', placeholder: 'Enter your email' },
-        },
-        serial_code: {
-          label: 'Product Serial Code',
-          inputProps: { type: 'text', placeholder: 'Enter the serial code' },
-        },
-        date_time: {
-          // @ts-ignore
-          label: 'Lost Date & Time',
-          description: 'Specify when the item was lost.',
-          inputProps: { type: 'datetime-local' },
-        },
-        country: {
-          label: 'Country',
-          inputProps: { type: 'text', placeholder: 'Enter your country' },
-        },
-        city: {
-          label: 'City',
-          inputProps: { type: 'text', placeholder: 'Enter your city' },
-        },
-        street_address: {
-          label: 'Street Address',
-          inputProps: { type: 'text', placeholder: 'Enter your street address' },
-        },
-        purchase_location: {
-          label: 'Purchase Location',
-          inputProps: { type: 'text', placeholder: 'Enter the purchase location' },
-        },
-        id_card_image: {
-          label: 'Upload ID Card',
-          description: 'Accepted formats: JPG, PNG, PDF.',
-          component: 'file',
-          inputProps: { accept: '.jpg,.png,.pdf' },
-        },
-        files: {
-          label: 'Upload Files',
-          description: 'Upload any relevant documents or images.',
-          component: 'file',
-          inputProps: { multiple: true },
-        },
-        item_type: {
-          label: 'Lost Item Type',
-          description: 'Select the type of item you lost.',
-        },
-        location: {},
-      }"
-      :dependencies="[
-        {
-          sourceField: 'item_type',
-          type: DependencyType.SETS_OPTIONS,
-          targetField: 'item_type',
-          when: (sourceFieldValue) => sourceFieldValue === 'item_type',
-          options: ['Bag', 'Shoe', 'Watch', 'Other'],
-        },
-      ]"
-      @submit="onSubmit"
-    >
-      <template #location="slotProps">
-        <div
-          @click="
-            () => {
-              fetchAddress(coords.latitude, coords.longitude, form);
+    <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mx-auto grid grid-cols-3 gap-4">
+      <div>
+        <Label for="product_name">Product Name</Label>
+        <Input id="product_name" v-model="productName" placeholder="Enter product name" />
+      </div>
+      <div>
+        <Label for="email">Email Address</Label>
+        <Input id="email" type="email" v-model="email" placeholder="Enter your email" />
+      </div>
+      <div>
+        <Label for="serial_code">Serial Code</Label>
+        <Input id="serial_code" v-model="serialCode" placeholder="Enter serial code" />
+      </div>
+      <div>
+        <Label for="date_time">Lost Date &amp; Time </Label>
+        <DatePicker
+          :value="dateTime"
+          @modelValue="
+            (val: any) => {
+              dateTime = val;
             }
           "
+        />
+      </div>
+      <div>
+        <Label for="country">Country</Label>
+        <Input id="country" v-model="country" placeholder="Enter country" />
+      </div>
+      <div>
+        <Label for="city">City</Label>
+        <Input id="city" v-model="city" placeholder="Enter city" />
+      </div>
+      <div>
+        <Label for="street_address">Street Address</Label>
+        <Input id="street_address" v-model="streetAddress" placeholder="Enter street address" />
+      </div>
+      <div>
+        <Label for="purchase_location">Purchase Location</Label>
+        <Input id="purchase_location" v-model="purchaseLocation" placeholder="Enter purchase location" />
+      </div>
+      <div>
+        <Label for="item_type">Item Type </Label>
+        <Select onchange="(itemType = $event.target.value)" id="item_type" v-model="itemType">
+          <SelectTrigger>
+            <SelectValue placeholder="Select item" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem v-for="item in ['Bag', 'Shoe', 'Watch', 'Other']" :key="item" :value="item"> {{ item }} </SelectItem>
+            </SelectGroup>
+          </SelectContent></Select
         >
-          <FormField :name="slotProps.fieldName">
-            <FormItem v-bind="$attrs">
-              <AutoFormLabel>Location </AutoFormLabel>
+      </div>
+      <div>
+        <Label for="id_card_image">Upload ID Card</Label>
+        <Input id="id_card_image" type="file" accept="image/*" @change="handleIdCardImage" />
+      </div>
+      <div>
+        <Label for="files">Upload Files</Label>
+        <Input id="files" type="file" accept="image/*" multiple @change="handleFiles" />
+      </div>
+      <div
+        class="flex flex-col justify-end"
+        @click="
+          () => {
+            fetchAddress(coords.latitude, coords.longitude, {
+              country,
+              city,
+              streetAddress,
+            });
+          }
+        "
+      >
+        <Button type="button" class="w-full bg-primary-foreground text-primary hover:text-primary-foreground">Get Address</Button>
+      </div>
 
-              <FormControl>
-                <Button class="block h-10 w-full rounded-lg border border-input" type="button" variant="secondary" v-bind="slotProps"
-                  >Location</Button
-                >
-              </FormControl>
-
-              <!-- <FormDescription> Select the location where you purchased the item. </FormDescription> -->
-              <FormMessage />
-            </FormItem>
-          </FormField>
-        </div>
-      </template>
-      <Button class="col-span-full ml-auto mt-4 w-32" type="submit"> Submit </Button>
-    </AutoForm>
+      <div class="col-span-full flex w-full flex-col justify-end">
+        <Button class="ml-auto w-32" type="submit">Submit</Button>
+      </div>
+    </form>
   </section>
 </template>

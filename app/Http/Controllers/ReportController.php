@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Report;
 use App\Models\Upload;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -13,7 +12,6 @@ class ReportController extends Controller
 {
     public function store(Request $request)
     {
-
         $data = $request->validate([
             'city' => 'required|string',
             'country' => 'required|string',
@@ -24,66 +22,50 @@ class ReportController extends Controller
             'street_address' => 'required|string',
             'type' => 'required|in:stolen,lost',
             'product_name' => 'required|string|max:255',
-            'serial_code' => 'required|string|unique:reports,serial_code',
+            'serial_code' => 'required|string',
             'location' => 'nullable|string',
             'files.*' => 'nullable|file|mimes:jpg,png,pdf',
-            'id_card_image' => 'nullable|string',
-
+            // 'id_card_image' => 'nullable|file|mimes:jpg,png,pdf',
+            'id_card_image' => 'nullable|file|mimes:jpg,png,pdf',
         ]);
-        $data['user_id'] = auth()->user()->id;
+
+        $data['user_id'] = auth()->check() ? auth()->user()->id : null;
+        if (!$data['user_id']) {
+            return redirect()->route('login');
+        }
+
         $report = Report::create($data);
         if (!$report) {
             return response()->json(['message' => 'Failed to create report'], 500);
         }
 
-        if ($request->hasFile('files')) {
-            $files = array_map(fn($file) => 'storage/' . $file->store('uploads', 'public'), $request->file('files'));
-            foreach ($files as $file) {
-                Upload::create([
-                    'report_id' => $report->id,
-                    'file_path' => $file,
-                    'file_type' => 'product'
-                ]);
-            }
-        } elseif ($request->input('files')) {
-            $inputFiles = $request->input('files');
-            if (is_array($inputFiles)) {
-                $files = array_map(fn($base64) => $this->storeBase64Image($base64), $inputFiles);
-                foreach ($files as $file) {
-                    Upload::create([
-                        'report_id' => $report->id,
-                        'file_path' => $file,
-                        'file_type' => 'product'
-                    ]);
-                }
-            } else {
-                $file = $this->storeBase64Image($inputFiles);
-                Upload::create([
-                    'report_id' => $report->id,
-                    'file_path' => $file,
-                    'file_type' => 'product'
-                ]);
-            }
-        }
 
+        // dd($request->hasFile('files'));
         if ($request->hasFile('id_card_image')) {
-            $path = $request->file('id_card_image')->store('uploads', 'public');
+            $data['id_card_image'] = $request->file('id_card_image')->store('uploads', 'public');
             Upload::create([
+                'file_path' => $data['id_card_image'],
                 'report_id' => $report->id,
-                'file_path' => 'storage/' . $path,
                 'file_type' => 'id_card'
             ]);
-        } elseif ($request->input('id_card_image')) {
-            $imagePath = $this->storeBase64Image($request->input('id_card_image'));
-            if ($imagePath) {
+        }
+
+        if ($request->hasFile('files')) {
+            // Get array of uploaded files
+            $uploadedFiles = $request->file('files');
+
+            foreach ($uploadedFiles as $file) {
+                // Store each file on the public disk (returns the file path relative to storage/app/public)
+                $filePath = 'storage/' . $file->store('uploads', 'public');
+
+                // Create an upload record for each file
                 Upload::create([
                     'report_id' => $report->id,
-                    'file_path' => $imagePath,
-                    'file_type' => 'id_card'
+                    'file_path' => $filePath,
+                    'file_type' => 'product', // adjust this value as needed
                 ]);
             }
         }
-
 
         return redirect()->back()->with('success', 'Lost item reported successfully.');
     }
@@ -94,8 +76,11 @@ class ReportController extends Controller
         $report->delete();
         return response()->json(['message' => 'Report deleted successfully']);
     }
+
+
     private function storeBase64Image($base64Image)
     {
+        // Remove the data URL prefix (if present)
         $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $base64Image);
         $decodedFile = base64_decode($imageData);
 
@@ -103,9 +88,12 @@ class ReportController extends Controller
             return null;
         }
 
+        // Generate a unique filename
         $fileName = 'uploads/' . uniqid() . '.png';
+
+        // Store the decoded image
         Storage::disk('public')->put($fileName, $decodedFile);
 
-        return 'storage/' . $fileName;
+        return 'storage/' . $fileName; // Fixed: Return accessible path
     }
 }

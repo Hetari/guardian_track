@@ -4,13 +4,11 @@ import { ref } from 'vue';
 
 export function useLocation(form: any) {
   const { coords } = useGeolocation();
-  const country = ref<string>('');
-  const city = ref<string>('');
-  const street_address = ref<string>('');
   const address = ref<string>('');
   const error = ref<string | null>(null);
 
   async function fetchAddress(lat: number, lon: number, form: any) {
+    const { country, city, streetAddress } = form;
     try {
       const response = await axios.get('https://nominatim.openstreetmap.org/reverse', {
         params: {
@@ -19,14 +17,17 @@ export function useLocation(form: any) {
           format: 'json',
         },
       });
-      const data = response.data;
-      country.value = data.address.country || '';
-      city.value = data.address.city || data.address.town || data.address.village || '';
-      street_address.value = data.address.road || '';
+      const { data } = response;
 
-      form.setFieldValue('country', data.address.country || '');
-      form.setFieldValue('city', data.address.city || data.address.town || data.address.village || '');
-      form.setFieldValue('street_address', data.address.road || '');
+      if (data.address.country) {
+        country.value = data.address.country;
+      }
+      if (data.address.city || data.address.town || data.address.village) {
+        city.value = data.address.city || data.address.town || data.address.village;
+      }
+      if (data.address.road) {
+        streetAddress.value = data.address.road;
+      }
     } catch (err) {
       console.error('Error fetching address:', err);
     }

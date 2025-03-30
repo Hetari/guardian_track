@@ -20,7 +20,7 @@ return new class extends Migration
                 ->cascadeOnUpdate();
             $table->enum('type', ['stolen', 'lost']);
             $table->string('product_name');
-            $table->string('serial_code')->unique();
+            $table->string('serial_code');
             $table->text('location')->nullable();
             $table->dateTime('date_time');
             $table->string('country');
