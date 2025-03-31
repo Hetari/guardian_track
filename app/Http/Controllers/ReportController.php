@@ -16,7 +16,6 @@ class ReportController extends Controller
             'city' => 'required|string',
             'country' => 'required|string',
             'date_time' => 'required|date|before:now',
-            // TODO:
             'item_type' => 'required|in:Bag,Shoe,Watch,Other',
             'purchase_location' => 'required|string',
             'street_address' => 'required|string',

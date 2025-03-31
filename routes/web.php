@@ -108,6 +108,75 @@ Route::group(['middleware' => ['auth', 'verified', 'admin']], function () {
             return Inertia::location(route('users'));
         })->name('users.delete');
     });
+
+    Route::group(['prefix' => 'dashboard/reports', 'as' => 'reports'], function () {
+        Route::get('/', function () {
+            $reports = \App\Models\Report::with('user')
+                ->select(
+                    'id',
+                    'user_id',
+                    'type',
+                    'product_name',
+                    'serial_code',
+                    'date_time',
+                    'country',
+                    'city',
+                    'street_address',
+                    'purchase_location',
+                    'item_type',
+                    'status'
+                )
+                ->get();
+
+            return Inertia::render('Dashboard/Reports', [
+                'reports' => $reports,
+            ]);
+        })->name('');
+
+        Route::post('/edit', function (\Illuminate\Http\Request $request) {
+            $validated = $request->validate([
+                'city' => 'required|string',
+                'country' => 'required|string',
+                'date_time' => 'required|date|before:now',
+                'item_type' => 'required|in:Bag,Shoe,Watch,Other',
+                'purchase_location' => 'required|string',
+                'street_address' => 'required|string',
+                'type' => 'required|in:stolen,lost',
+                'product_name' => 'required|string|max:255',
+                'serial_code' => 'required|string',
+                'files.*' => 'nullable|file|mimes:jpg,png,pdf',
+                'id_card_image' => 'nullable|file|mimes:jpg,png,pdf',
+            ]);
+
+            $report = \App\Models\User::find($validated['id']);
+            if (!$report) {
+                return redirect()->back()->withErrors(['report' => 'Report not found']);
+            }
+
+            $report->type = $validated['type'];
+            $report->product_name = $validated['product_name'];
+            $report->serial_code = $validated['serial_code'];
+            $report->date_time = $validated['date_time'];
+            $report->country = $validated['country'];
+            $report->city = $validated['city'];
+            $report->street_address = $validated['street_address'];
+            $report->purchase_location = $validated['purchase_location'];
+            $report->item_type = $validated['item_type'];
+            $report->status = $validated['status'];
+            $report->save();
+
+            return Inertia::location(route('reports'));
+        })->name('reports.edit');
+
+        Route::delete('/delete/{id}', function ($id) {
+            $report = \App\Models\Report::find($id);
+            if (!$report) {
+                return redirect()->back()->withErrors(['report' => 'Report not found']);
+            }
+            $report->delete();
+            return Inertia::location(route('reports'));
+        })->name('reports.delete');
+    });
 });
 
 require __DIR__ . '/settings.php';
