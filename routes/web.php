@@ -63,7 +63,12 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' 
 // Admin routes
 Route::group(['middleware' => ['auth', 'verified', 'admin']], function () {
     Route::get('dashboard', function () {
-        return Inertia::render('Dashboard');
+        $users_count = \App\Models\User::count();
+        $reports_count = \App\Models\Report::count();
+        return Inertia::render('Dashboard', [
+            'users_count' => $users_count,
+            'reports_count' => $reports_count,
+        ]);
     })->name('dashboard');
 });
 
