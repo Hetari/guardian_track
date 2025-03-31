@@ -1,9 +1,9 @@
 <template>
-  <div class="relative z-[999999] flex size-full w-full flex-col justify-end">
+  <div class="relative z-[999999] flex size-full flex-col justify-end">
     <div class="flex h-fit flex-col justify-evenly pt-12">
       <!-- First Row -->
       <div class="relative">
-        <div class="container mx-auto flex items-center justify-between px-12 py-10 text-white">
+        <div class="container mx-auto flex flex-col items-start justify-between px-6 py-10 text-white md:flex-row md:items-center md:px-12">
           <p>Intrusion Detection</p>
           <p>Server Integrity</p>
           <p>End-to-End Encryption</p>
@@ -13,7 +13,7 @@
         <div class="absolute left-0 right-0 top-0 h-[2px] bg-white opacity-30"></div>
       </div>
       <div class="relative">
-        <div class="container mx-auto flex items-center justify-between px-12 py-10 text-white">
+        <div class="container mx-auto flex flex-col items-start justify-between px-6 py-10 text-white md:flex-row md:items-center md:px-12">
           <p>Login</p>
           <p>Access Control</p>
         </div>
