@@ -102,7 +102,7 @@
             name: 'Edit',
             icon: PenIcon,
             onSubmit: (data: any) => {
-              router.post('/users/edit', {
+              router.post('/dashboard/users/edit', {
                 id: row.original.id,
                 ...data,
               });
@@ -113,7 +113,7 @@
             name: 'Delete',
             icon: Trash,
             onSubmit: () => {
-              router.delete(`/users/delete/${row.original.id}`);
+              router.delete(`/dashboard/users/delete/${row.original.id}`);
             },
             row: row.original,
           },

@@ -70,7 +70,8 @@ Route::group(['middleware' => ['auth', 'verified', 'admin']], function () {
             'reports_count' => $reports_count,
         ]);
     })->name('dashboard');
-    Route::group(['prefix' => 'users', 'as' => 'users'], function () {
+
+    Route::group(['prefix' => 'dashboard/users', 'as' => 'users'], function () {
         Route::get('/', function () {
             $users = \App\Models\User::withCount('reports')->get();
             return Inertia::render('Dashboard/Users', [
