@@ -269,7 +269,7 @@
           }
         "
       >
-        <Button type="button" class="w-full bg-primary-foreground text-primary hover:text-primary-foreground">Get Address</Button>
+        <Button type="button" class="w-full" variant="secondary">Get Address</Button>
       </div>
 
       <div class="col-span-full flex w-full flex-col justify-end">

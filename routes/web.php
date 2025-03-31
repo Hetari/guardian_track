@@ -65,11 +65,48 @@ Route::group(['middleware' => ['auth', 'verified', 'admin']], function () {
     Route::get('dashboard', function () {
         $users_count = \App\Models\User::count();
         $reports_count = \App\Models\Report::count();
-        return Inertia::render('Dashboard', [
+        return Inertia::render('Dashboard/Index', [
             'users_count' => $users_count,
             'reports_count' => $reports_count,
         ]);
     })->name('dashboard');
+    Route::group(['prefix' => 'users', 'as' => 'users'], function () {
+        Route::get('/', function () {
+            $users = \App\Models\User::withCount('reports')->get();
+            return Inertia::render('Dashboard/Users', [
+                'users' => $users,
+            ]);
+        })->name('');
+
+        Route::post('/edit', function (\Illuminate\Http\Request $request) {
+            $validated = $request->validate([
+                'id' => 'required|exists:users,id',
+                'name' => 'required|string|max:255',
+                'email' => 'required|email',
+                'phone' => 'required|string|max:255',
+            ]);
+
+            $user = \App\Models\User::find($validated['id']);
+            if (!$user) {
+                return redirect()->back()->withErrors(['user' => 'User not found']);
+            }
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+            $user->phone = $validated['phone'];
+            $user->save();
+
+            return Inertia::location(route('users'));
+        })->name('users.edit');
+
+        Route::delete('/delete/{id}', function ($id) {
+            $user = \App\Models\User::find($id);
+            if (!$user) {
+                return redirect()->back()->withErrors(['user' => 'User not found']);
+            }
+            $user->delete();
+            return Inertia::location(route('users'));
+        })->name('users.delete');
+    });
 });
 
 require __DIR__ . '/settings.php';
