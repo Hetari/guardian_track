@@ -9,10 +9,16 @@
         <img src="/logo.png" alt="" />
       </div>
       <div class="flex items-center gap-x-4">
-        <Link class="rounded-full bg-gradient-to-r from-[#003332] from-[-10%] to-[#4FBBB9] px-6 py-2" :href="route('login')">login</Link>
-
+        <Link v-if="!is_authenticated" class="rounded-full bg-gradient-to-r from-[#003332] from-[-10%] to-[#4FBBB9] px-6 py-2" :href="route('login')"
+          >login</Link
+        >
+        <Link
+          v-else-if="is_authenticated && auth?.user?.role == 'admin'"
+          class="rounded-full bg-gradient-to-r from-[#003332] from-[-10%] to-[#4FBBB9] px-6 py-2"
+          :href="route('register')"
+          >create account
+        </Link>
         <Link v-if="is_authenticated" class="rounded-full bg-[#222] px-6 py-2" :href="route('reports.index')">reports</Link>
-        <!-- TODO: add register here -->
       </div>
     </header>
 
@@ -35,8 +41,21 @@
 <script setup lang="ts">
   import Lines from '@/components/website/Lines.vue';
   import Main from '@/components/website/Main.vue';
-  import { Head, Link } from '@inertiajs/vue3';
-  import { onBeforeMount } from 'vue';
+  import { Head, Link, usePage } from '@inertiajs/vue3';
+  import { computed, onBeforeMount } from 'vue';
+
+  const page = usePage();
+  const auth = computed(() => {
+    const user = page.props.auth as {
+      user: {
+        email: string;
+        id: number;
+        name: string;
+        role: string;
+      };
+    };
+    return user;
+  });
 
   const { is_authenticated = false } = defineProps<{ is_authenticated: boolean }>();
   // remove dark class
