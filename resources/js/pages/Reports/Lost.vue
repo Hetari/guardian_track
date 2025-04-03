@@ -177,10 +177,10 @@
   <Toaster />
 
   <div class="mt-2 hidden w-[340px] rounded-md bg-slate-950 p-4"></div>
-  <section class="body-font container relative mx-auto pt-24">
-    <h1 class="col-span-full pb-10 text-8xl font-bold text-[#ddd]">Lost Report</h1>
+  <section class="body-font container relative mx-auto py-10 sm:pt-24">
+    <h1 class="pb-10 text-4xl font-bold text-[#ddd] sm:text-5xl md:text-8xl">Lost Report</h1>
 
-    <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mx-auto grid grid-cols-3 gap-4">
+    <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
       <div>
         <Label for="product_name">Product Name</Label>
         <Input id="product_name" v-model="productName" placeholder="Enter product name" :class="{ 'border-red-500': errors.productName }" />
