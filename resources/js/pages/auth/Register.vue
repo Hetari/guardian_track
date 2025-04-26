@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import InputError from '@/components/InputError.vue';
-  import TextLink from '@/components/TextLink.vue';
   import { Button } from '@/components/ui/button';
   import { Input } from '@/components/ui/input';
   import { Label } from '@/components/ui/label';
@@ -11,11 +10,13 @@
   const form = useForm({
     name: '',
     email: '',
+    phone: '',
     password: '',
     password_confirmation: '',
   });
 
   const submit = () => {
+    form.phone = form.phone.toString();
     form.post(route('register'), {
       onFinish: () => form.reset('password', 'password_confirmation'),
     });
@@ -38,6 +39,12 @@
           <Label for="email">Email address</Label>
           <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
           <InputError :message="form.errors.email" />
+        </div>
+
+        <div class="grid gap-2">
+          <Label for="phone">Phone Number</Label>
+          <Input id="phone" type="number" required :tabindex="2" autocomplete="phone" v-model="form.phone" placeholder="123xxxxxx" />
+          <InputError :message="form.errors.phone" />
         </div>
 
         <div class="grid gap-2">
@@ -66,10 +73,11 @@
         </Button>
       </div>
 
-      <div class="text-center text-sm text-muted-foreground">
+      <!-- TODO: -->
+      <!-- <div class="text-center text-sm text-muted-foreground">
         Already have an account?
         <TextLink :href="route('login')" class="underline underline-offset-4" :tabindex="6">Log in</TextLink>
-      </div>
+      </div> -->
     </form>
   </AuthBase>
 </template>

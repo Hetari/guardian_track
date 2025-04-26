@@ -2,17 +2,30 @@
   import TextLink from '@/components/TextLink.vue';
   import { Button } from '@/components/ui/button';
   import AuthLayout from '@/layouts/AuthLayout.vue';
-  import { Head, useForm } from '@inertiajs/vue3';
+  import { Head, router, useForm } from '@inertiajs/vue3';
   import { LoaderCircle } from 'lucide-vue-next';
+  import { ref } from 'vue';
 
   defineProps<{
     status?: string;
   }>();
 
+  const message = ref('');
   const form = useForm({});
 
+  // const submit1 = () => {
+  //   form.post(route('verification.send'));
+  // };
   const submit = () => {
-    form.post(route('verification.send'));
+    router.post(
+      '/email/verification-notification',
+      {},
+      {
+        onSuccess: () => {
+          message.value = 'Verification email resent!';
+        },
+      },
+    );
   };
 </script>
 
@@ -32,5 +45,8 @@
 
       <TextLink :href="route('logout')" method="post" as="button" class="mx-auto block text-sm"> Log out </TextLink>
     </form>
+    <div v-if="message" class="mt-4 text-green-600">
+      {{ message }}
+    </div>
   </AuthLayout>
 </template>

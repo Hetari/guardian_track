@@ -6,9 +6,21 @@
   import { Input } from '@/components/ui/input';
   import { Label } from '@/components/ui/label';
   import AuthBase from '@/layouts/AuthLayout.vue';
-  import { Head, useForm } from '@inertiajs/vue3';
+  import { cn } from '@/lib/utils';
+  import { Head, router, useForm, usePage } from '@inertiajs/vue3';
   import { LoaderCircle } from 'lucide-vue-next';
+  import { computed } from 'vue';
 
+  type User = {
+    user: {
+      id: number;
+      name: string;
+      email: string;
+      email_verified_at: string | null;
+      phone: string;
+      role: string;
+    };
+  };
   defineProps<{
     status?: string;
     canResetPassword: boolean;
@@ -20,9 +32,22 @@
     remember: false,
   });
 
+  const page = usePage();
+  const auth = computed<User>(() => page.props.auth as User);
   const submit = () => {
     form.post(route('login'), {
       onFinish: () => form.reset('password'),
+      onSuccess: () => {
+        if (!auth.value.user.email_verified_at) {
+          router.visit('/verify-email');
+        } else {
+          if (auth.value.user.role === 'admin') {
+            router.visit('/dashboard');
+          } else {
+            router.visit('/home');
+          }
+        }
+      },
     });
   };
 </script>
@@ -62,12 +87,17 @@
 
         <div class="flex items-center justify-between" :tabindex="3">
           <Label for="remember" class="flex items-center space-x-3">
-            <Checkbox id="remember" v-model:checked="form.remember" :tabindex="4" />
+            <Checkbox
+              :class="cn('data-[state=checked]:border-0 data-[state=checked]:bg-[#4FBBB9]')"
+              id="remember"
+              v-model:checked="form.remember"
+              :tabindex="4"
+            />
             <span>Remember me</span>
           </Label>
         </div>
 
-        <Button type="submit" class="mt-4 w-full" :tabindex="4" :disabled="form.processing">
+        <Button type="submit" class="mt-4 w-full" :class="cn('bg-[#4FBBB9] hover:bg-[#3e9694]')" :tabindex="4" :disabled="form.processing">
           <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
           Log in
         </Button>
