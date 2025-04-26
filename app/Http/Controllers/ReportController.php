@@ -6,10 +6,57 @@ use Illuminate\Http\Request;
 use App\Models\Report;
 use App\Models\Upload;
 use Illuminate\Support\Facades\Storage;
-
+use Inertia\Inertia;
 
 class ReportController extends Controller
 {
+    public function index()
+    {
+        return Inertia::render('Reports/Index');
+    }
+    public function lost()
+    {
+        return Inertia::render('Reports/Lost');
+    }
+
+    public function stolen()
+    {
+        return Inertia::render('Reports/Stolen');
+    }
+
+    public function status()
+    {
+        $status = [
+            'received' => 'received',
+            'checking_brand' => 'checking brand',
+            'checking_company' => 'checking company',
+            'transferred_to_police' => 'transferred to police',
+            'done' => 'done',
+        ];
+
+        $reports = auth()->user()
+            ->reports()
+            ->select(
+                'id',
+                'type',
+                'product_name',
+                'serial_code',
+                'date_time',
+                'country',
+                'city',
+                'street_address',
+                'purchase_location',
+                'item_type',
+                'status'
+            )
+            ->get();
+
+        return Inertia::render('Reports/Status', [
+            'reports' => $reports,
+            'statuses' => $status,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([

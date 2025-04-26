@@ -1,183 +1,46 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ReportManagementController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    $user = auth()->user();
-    return Inertia::render('Welcome', [
-        'is_authenticated' => $user ? true : false,
-    ]);
-})->name('home');
+// Home
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Reports
 Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' => 'reports.'], function () {
-    Route::get('/', function () {
-        return Inertia::render('Reports/Index');
-    })->name('index');
-
-    Route::get('/lost', function () {
-        return Inertia::render("Reports/Lost");
-    })->name('lost');
-    Route::get('/stolen', function () {
-        return Inertia::render("Reports/Stolen");
-    })->name('stolen');
-
+    Route::get('/', [ReportController::class, 'index'])->name('index');
+    Route::get('/lost', [ReportController::class, 'lost'])->name('lost');
+    Route::get('/stolen', [ReportController::class, 'stolen'])->name('stolen');
 
     Route::group(['prefix' => 'items'], function () {
         Route::post('/stolen', [ReportController::class, 'store'])->name('stolen.store');
         Route::post('/lost', [ReportController::class, 'store'])->name('lost.store');
     });
 
-    Route::get('/status', function () {
-        $status = [
-            'received' => 'received',
-            'checking_brand' => 'checking brand',
-            'checking_company' => 'checking company',
-            'transferred_to_police' => 'transferred to police',
-            'done' => 'done',
-        ];
-        $reports = auth()->user()
-            ->reports()
-            ->select(
-                'id',
-                'type',
-                'product_name',
-                'serial_code',
-                'date_time',
-                'country',
-                'city',
-                'street_address',
-                'purchase_location',
-                'item_type',
-                'status'
-            )
-            ->get();
-        return Inertia::render('Reports/Status', [
-            'reports' => $reports,
-            'statuses' => $status,
-        ]);
-    })->name('status');
+    Route::get('/status', [ReportController::class, 'status'])->name('status');
 });
 
-// Admin routes
+// Admin Dashboard
 Route::group(['middleware' => ['auth', 'verified', 'admin']], function () {
-    Route::get('dashboard', function () {
-        $users_count = \App\Models\User::count();
-        $reports_count = \App\Models\Report::count();
-        return Inertia::render('Dashboard/Index', [
-            'users_count' => $users_count,
-            'reports_count' => $reports_count,
-        ]);
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::group(['prefix' => 'dashboard/users', 'as' => 'users'], function () {
-        Route::get('/', function () {
-            $users = \App\Models\User::withCount('reports')->get();
-            return Inertia::render('Dashboard/Users', [
-                'users' => $users,
-            ]);
-        })->name('');
-
-        Route::post('/edit', function (\Illuminate\Http\Request $request) {
-            $validated = $request->validate([
-                'id' => 'required|exists:users,id',
-                'name' => 'required|string|max:255',
-                'email' => 'required|email',
-                'phone' => 'required|string|max:255',
-            ]);
-
-            $user = \App\Models\User::find($validated['id']);
-            if (!$user) {
-                return redirect()->back()->withErrors(['user' => 'User not found']);
-            }
-            $user->name = $validated['name'];
-            $user->email = $validated['email'];
-            $user->phone = $validated['phone'];
-            $user->save();
-
-            return Inertia::location(route('users'));
-        })->name('users.edit');
-
-        Route::delete('/delete/{id}', function ($id) {
-            $user = \App\Models\User::find($id);
-            if (!$user) {
-                return redirect()->back()->withErrors(['user' => 'User not found']);
-            }
-            $user->delete();
-            return Inertia::location(route('users'));
-        })->name('users.delete');
+    Route::group(['prefix' => 'dashboard/users', 'as' => 'users.'], function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::post('/edit', [UserController::class, 'edit'])->name('edit');
+        Route::delete('/delete/{id}', [UserController::class, 'delete'])->name('delete');
     });
 
-    Route::group(['prefix' => 'dashboard/reports', 'as' => 'reports'], function () {
-        Route::get('/', function () {
-            $reports = \App\Models\Report::with('user')
-                ->select(
-                    'id',
-                    'user_id',
-                    'type',
-                    'product_name',
-                    'serial_code',
-                    'date_time',
-                    'country',
-                    'city',
-                    'street_address',
-                    'purchase_location',
-                    'item_type',
-                    'status'
-                )
-                ->get();
-
-            return Inertia::render('Dashboard/Reports', [
-                'reports' => $reports,
-            ]);
-        })->name('');
-
-        Route::post('/edit', function (\Illuminate\Http\Request $request) {
-            $validated = $request->validate([
-                'city' => 'required|string',
-                'country' => 'required|string',
-                'date_time' => 'required|date|before:now',
-                'item_type' => 'required|in:Bag,Shoe,Watch,Other',
-                'purchase_location' => 'required|string',
-                'street_address' => 'required|string',
-                'type' => 'required|in:stolen,lost',
-                'product_name' => 'required|string|max:255',
-                'serial_code' => 'required|string',
-                'files.*' => 'nullable|file|mimes:jpg,png,pdf',
-                'id_card_image' => 'nullable|file|mimes:jpg,png,pdf',
-            ]);
-
-            $report = \App\Models\User::find($validated['id']);
-            if (!$report) {
-                return redirect()->back()->withErrors(['report' => 'Report not found']);
-            }
-
-            $report->type = $validated['type'];
-            $report->product_name = $validated['product_name'];
-            $report->serial_code = $validated['serial_code'];
-            $report->date_time = $validated['date_time'];
-            $report->country = $validated['country'];
-            $report->city = $validated['city'];
-            $report->street_address = $validated['street_address'];
-            $report->purchase_location = $validated['purchase_location'];
-            $report->item_type = $validated['item_type'];
-            $report->status = $validated['status'];
-            $report->save();
-
-            return Inertia::location(route('reports'));
-        })->name('reports.edit');
-
-        Route::delete('/delete/{id}', function ($id) {
-            $report = \App\Models\Report::find($id);
-            if (!$report) {
-                return redirect()->back()->withErrors(['report' => 'Report not found']);
-            }
-            $report->delete();
-            return Inertia::location(route('reports'));
-        })->name('reports.delete');
+    Route::group(['prefix' => 'dashboard/reports', 'as' => 'reports.'], function () {
+        Route::get('/', [ReportManagementController::class, 'index'])->name('index');
+        Route::post('/edit', [ReportManagementController::class, 'edit'])->name('edit');
+        Route::delete('/delete/{id}', [ReportManagementController::class, 'delete'])->name('delete');
     });
 });
 
+// Other includes
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
