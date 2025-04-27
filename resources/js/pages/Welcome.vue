@@ -48,7 +48,7 @@
   import Lines from '@/components/website/Lines.vue';
   import Main from '@/components/website/Main.vue';
   import { Head, Link, usePage } from '@inertiajs/vue3';
-  import { computed, onBeforeMount } from 'vue';
+  import { computed } from 'vue';
 
   const page = usePage();
   const auth = computed(() => {
@@ -64,14 +64,4 @@
   });
 
   const { is_authenticated = false } = defineProps<{ is_authenticated: boolean }>();
-  // remove dark class
-  onBeforeMount(() => {
-    const htmlElement = document.querySelector('html');
-    if (htmlElement) {
-      const classes = htmlElement.classList;
-      if (!classes.contains('dark')) {
-        classes.add('dark');
-      }
-    }
-  });
 </script>
