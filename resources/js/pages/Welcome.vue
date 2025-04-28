@@ -21,7 +21,12 @@
           :href="route('register')"
           >create account
         </Link>
-        <Link v-if="is_authenticated" class="rounded-full bg-[#222] px-3 py-2 md:px-6" :href="route('reports.index')">reports</Link>
+        <Link
+          v-if="is_authenticated"
+          class="rounded-full bg-[#222] px-3 py-2 md:px-6"
+          :href="auth?.user?.role === 'admin' ? route('dashboard.reports.index') : route('reports.index')"
+          >reports</Link
+        >
       </div>
     </header>
 
@@ -70,7 +75,6 @@
     if (htmlElement) {
       const classes = htmlElement.classList;
       if (!classes.contains('dark')) {
-        console.log('dark class removed');
         classes.add('dark');
       }
     }
