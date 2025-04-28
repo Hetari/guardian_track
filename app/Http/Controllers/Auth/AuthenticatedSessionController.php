@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -31,16 +32,17 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
+        $user = auth()->user();
 
-        // if (!auth()->user()->hasVerifiedEmail()) {
-        //     return redirect()->route('verification.notice');
-        // }
-        // if (auth()->user()->role === 'admin') {
-        //     return redirect()->intended(route('dashboard', absolute: false));
-        // } else {
-        // return redirect()->intended(route('home', absolute: false));
-        return redirect('/');
-        // }
+        if (is_null($user->email_verified_at) && $user->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice');
+        }
+
+        if ($user->role === 'admin') {
+            return redirect()->route('dashboard.index');
+        } else {
+            return redirect()->route('home');
+        }
     }
 
     /**
