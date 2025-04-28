@@ -34,7 +34,8 @@ class ReportController extends Controller
             'done' => 'done',
         ];
 
-        $reports = auth()->user()
+        $currentUser = auth()->user();
+        $reports = $currentUser
             ->reports()
             ->select(
                 'id',
@@ -50,7 +51,6 @@ class ReportController extends Controller
                 'status'
             )
             ->get();
-
         return Inertia::render('Reports/Status', [
             'reports' => $reports,
             'statuses' => $status,

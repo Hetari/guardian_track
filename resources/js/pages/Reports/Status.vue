@@ -19,10 +19,13 @@
   }>();
 </script>
 <template>
-  <section class="body-font container relative mx-auto pt-24">
-    <h1 class="col-span-full pb-10 text-8xl font-bold text-[#ddd]">Report Status</h1>
+  <section class="body-font container relative mx-auto py-10 sm:py-10">
+    <div class="col-span-full flex items-center justify-between pb-10 text-4xl font-bold text-[#ddd] sm:text-5xl md:text-8xl">
+      <h1>Report Status</h1>
+      <Link class="rounded-full bg-[#333] px-3 py-2 text-sm md:px-6" :href="route('logout')">Logout </Link>
+    </div>
 
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-3 gap-4" v-if="reports && reports.length">
       <div v-for="report in reports" :key="report.id" class="rounded-2xl border border-[#333] bg-[#1F1F1F] p-6 shadow-xl backdrop-blur-lg">
         <div class="flex flex-col space-y-4">
           <!-- Report Details -->
@@ -69,6 +72,9 @@
           </div>
         </div>
       </div>
+    </div>
+    <div v-else class="flex min-h-[70vh] items-center justify-center text-center text-2xl text-gray-500">
+      <p>No reports found.</p>
     </div>
   </section>
 </template>

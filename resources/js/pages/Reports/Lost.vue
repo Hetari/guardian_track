@@ -11,7 +11,7 @@
   import SelectValue from '@/components/ui/select/SelectValue.vue';
   import { toast } from '@/components/ui/toast';
   import Toaster from '@/components/ui/toast/Toaster.vue';
-  import { router } from '@inertiajs/vue3';
+  import { Link, router } from '@inertiajs/vue3';
   import { DateValue } from 'reka-ui';
   import { ref, watch } from 'vue';
   import { useLocation } from './useLocation';
@@ -177,8 +177,11 @@
   <Toaster />
 
   <div class="mt-2 hidden w-[340px] rounded-md bg-slate-950 p-4"></div>
-  <section class="body-font container relative mx-auto py-10 sm:pt-24">
-    <h1 class="pb-10 text-4xl font-bold text-[#ddd] sm:text-5xl md:text-8xl">Lost Report</h1>
+  <section class="body-font container relative mx-auto py-10 sm:py-10">
+    <div class="col-span-full flex items-center justify-between pb-10 text-4xl font-bold text-[#ddd] sm:text-5xl md:text-8xl">
+      <h1>Lost Report</h1>
+      <Link class="rounded-full bg-[#333] px-3 py-2 text-sm md:px-6" :href="route('logout')">Logout </Link>
+    </div>
 
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
       <div>

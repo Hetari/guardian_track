@@ -3,8 +3,11 @@
     <link rel="preconnect" href="https://rsms.me/" />
   </Head>
 
-  <section class="body-font container mx-auto grid grid-cols-1 gap-10 py-24 sm:grid-cols-2 md:grid-cols-3">
-    <h1 class="col-span-full text-8xl font-bold text-[#ddd]">Reports</h1>
+  <section class="body-font container mx-auto grid grid-cols-1 gap-10 py-24 sm:grid-cols-2 sm:py-10 md:grid-cols-3">
+    <div class="col-span-full flex items-center justify-between pb-10 text-4xl font-bold text-[#ddd] sm:text-5xl md:text-8xl">
+      <h1>Reports</h1>
+      <Link class="rounded-full bg-[#333] px-3 py-2 text-sm md:px-6" :href="route('logout')">Logout </Link>
+    </div>
 
     <template v-for="circle in circles" :key="circle.name">
       <Link
