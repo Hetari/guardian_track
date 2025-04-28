@@ -4,10 +4,10 @@
   import { Head } from '@inertiajs/vue3';
 
   const breadcrumbs: BreadcrumbItem[] = [
-    {
-      title: 'Dashboard',
-      href: '/dashboard',
-    },
+    // {
+    //   title: 'Dashboard',
+    //   href: '/dashboard',
+    // },
   ];
 
   const { users_count = 0, reports_count = 0 } = defineProps<{
