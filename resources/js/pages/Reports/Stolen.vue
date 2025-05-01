@@ -1,9 +1,9 @@
 <script setup lang="ts">
   import { Button } from '@/components/ui/button';
-  import DatePicker from '@/components/ui/DatePicker.vue';
   import { Input } from '@/components/ui/input';
   import { Label } from '@/components/ui/label';
   import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+  import InputDatePicker from '@/components/ui/time-picker/InputDatePicker.vue';
   import { toast, Toaster } from '@/components/ui/toast';
   import { Link, router } from '@inertiajs/vue3';
   import { DateValue } from 'reka-ui';
@@ -122,7 +122,7 @@
       onSuccess: () => toast({ title: 'Success', description: 'Report submitted.' }),
       onError: (formErrors) => {
         errors.value = formErrors;
-        toast({ title: 'Error', description: formErrors });
+        toast({ title: 'Error', description: formErrors.message });
       },
     });
   }
@@ -156,14 +156,15 @@
       </div>
       <div>
         <Label for="date_time">Stolen Date</Label>
-        <DatePicker
+        <InputDatePicker v-model="dateTime" />
+        <!-- <DatePicker
           :value="dateTime"
           @modelValue="
             (val: any) => {
               dateTime = val;
             }
           "
-        />
+        /> -->
         <span v-if="errors.date_time" class="text-sm text-red-500">{{ errors.date_time }}</span>
       </div>
       <div>

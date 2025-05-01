@@ -65,6 +65,10 @@ class ReportController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'date_time' => preg_replace('/\s*\(.*\)$/', '', $request->input('date_time')),
+        ]);
+
         $data = $request->validate([
             'type' => 'required|in:stolen,lost',
             'customer_name' => 'required|string|max:255',
@@ -80,6 +84,8 @@ class ReportController extends Controller
             'id_card_image' => 'nullable|file|mimes:jpg,png,pdf',
             'tracking_code' => 'nullable|string|unique:reports,tracking_code',
         ]);
+
+        dd($data);
 
         // TODO: if there is no tracking_code generate it
         if (empty($data['tracking_code'])) {
