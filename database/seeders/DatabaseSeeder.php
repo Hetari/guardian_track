@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\PartnerCompany;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -29,5 +30,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
             'phone' => '1234567891',
         ]);
+
+        PartnerCompany::create(['name' => 'Company A', 'active' => true]);
+        PartnerCompany::create(['name' => 'Company B', 'active' => false]);
+        PartnerCompany::create(['name' => 'Company C', 'active' => true]);
     }
 }

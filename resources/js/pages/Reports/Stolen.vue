@@ -3,174 +3,134 @@
   import DatePicker from '@/components/ui/DatePicker.vue';
   import { Input } from '@/components/ui/input';
   import { Label } from '@/components/ui/label';
-  import { Select } from '@/components/ui/select';
-  import SelectContent from '@/components/ui/select/SelectContent.vue';
-  import SelectGroup from '@/components/ui/select/SelectGroup.vue';
-  import SelectItem from '@/components/ui/select/SelectItem.vue';
-  import SelectTrigger from '@/components/ui/select/SelectTrigger.vue';
-  import SelectValue from '@/components/ui/select/SelectValue.vue';
-  import { toast } from '@/components/ui/toast';
-  import Toaster from '@/components/ui/toast/Toaster.vue';
+  import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+  import { toast, Toaster } from '@/components/ui/toast';
   import { Link, router } from '@inertiajs/vue3';
   import { DateValue } from 'reka-ui';
-  import { ref, watch } from 'vue';
+  import { ref } from 'vue';
   import { useLocation } from './useLocation';
 
-  const productName = ref('');
-  const email = ref('');
+  interface Company {
+    id: string;
+    name: string;
+    active: boolean;
+  }
+  const { companies = [] } = defineProps<{
+    companies: Company[];
+  }>();
+
+  const customerName = ref('');
   const serialCode = ref('');
   const dateTime = ref<DateValue | undefined>();
   const country = ref('');
   const city = ref('');
   const streetAddress = ref('');
-  const purchaseLocation = ref('');
+  const companyId = ref(''); // must map to company ID (string for FormData compatibility)
   const itemType = ref('');
   const idCardImage = ref<File | null>(null);
-  const files = ref<File[]>([]);
+  const ownershipDocument = ref<File | null>(null);
+  const lostOwnershipDocument = ref(false);
 
-  const errors = ref({
-    productName: '',
-    email: '',
-    serialCode: '',
-    dateTime: '',
-    country: '',
-    city: '',
-    streetAddress: '',
-    purchaseLocation: '',
-    itemType: '',
-    idCardImage: '',
-    files: '',
-  });
+  const errors = ref<Record<string, string>>({});
 
-  const { coords, fetchAddress } = useLocation({
-    country,
-    city,
-    streetAddress,
-  });
-
-  // Validation function
-  const skip = ref(true);
-  const validateForm = () => {
-    if (skip.value) {
-      skip.value = false;
-      return true;
-    }
-
+  function validateForm(): boolean {
+    errors.value = {};
     let valid = true;
-    // Reset errors
-    for (const key in errors.value) {
-      errors.value[key as keyof typeof errors.value] = '';
-    }
 
-    if (!productName.value) {
-      errors.value.productName = 'Product name is required.';
-      valid = false;
-    }
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      errors.value.email = 'Please enter a valid email address.';
+    if (!customerName.value) {
+      errors.value.customerName = 'Required';
       valid = false;
     }
     if (!serialCode.value) {
-      errors.value.serialCode = 'Serial code is required.';
+      errors.value.serialCode = 'Required';
       valid = false;
     }
     if (!dateTime.value) {
-      errors.value.dateTime = 'Date and time are required.';
+      errors.value.dateTime = 'Required';
       valid = false;
     }
     if (!country.value) {
-      errors.value.country = 'Country is required.';
+      errors.value.country = 'Required';
       valid = false;
     }
     if (!city.value) {
-      errors.value.city = 'City is required.';
+      errors.value.city = 'Required';
       valid = false;
     }
     if (!streetAddress.value) {
-      errors.value.streetAddress = 'Street address is required.';
+      errors.value.streetAddress = 'Required';
       valid = false;
     }
-    if (!purchaseLocation.value) {
-      errors.value.purchaseLocation = 'Purchase location is required.';
+    if (!companyId.value) {
+      errors.value.companyId = 'Required';
       valid = false;
     }
     if (!itemType.value) {
-      errors.value.itemType = 'Item type is required.';
+      errors.value.itemType = 'Required';
       valid = false;
     }
-
     if (!idCardImage.value) {
-      errors.value.idCardImage = 'ID card image is required.';
+      errors.value.idCardImage = 'Required';
       valid = false;
     }
-    if (files.value.length === 0) {
-      errors.value.files = 'At least one file is required.';
+    if (!lostOwnershipDocument.value && !ownershipDocument.value) {
+      errors.value.ownershipDocument = 'Provide document or mark as lost';
       valid = false;
     }
 
     return valid;
-  };
-
-  watch([productName, email, serialCode, dateTime, country, city, streetAddress, purchaseLocation, itemType, idCardImage, files], () => {
-    validateForm();
-  });
-
-  function handleIdCardImage(e: Event) {
-    const target = e.target as HTMLInputElement;
-    if (target.files && target.files[0]) {
-      idCardImage.value = target.files[0];
-    }
   }
 
-  function handleFiles(e: Event) {
-    const target = e.target as HTMLInputElement;
-    if (target.files) {
-      files.value = Array.from(target.files);
-    }
+  function handleIdCardImage(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) idCardImage.value = file;
+  }
+
+  function handleOwnershipDocument(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) ownershipDocument.value = file;
   }
 
   async function handleSubmit() {
     if (!validateForm()) {
-      toast({
-        title: 'Error',
-        description: 'Please fix the errors in the form before submitting.',
-      });
+      toast({ title: 'Validation Error', description: 'Please fix errors.' });
       return;
     }
 
     const formData = new FormData();
     formData.append('type', 'stolen');
-    formData.append('product_name', productName.value);
-    formData.append('email', email.value);
+    formData.append('customer_name', customerName.value);
     formData.append('serial_code', serialCode.value);
     formData.append('item_type', itemType.value);
-    formData.append('date_time', dateTime.value ? dateTime.value.toString() : '');
+    formData.append('date_time', dateTime.value?.toString() ?? '');
     formData.append('country', country.value);
     formData.append('city', city.value);
     formData.append('street_address', streetAddress.value);
-    formData.append('purchase_location', purchaseLocation.value);
+    formData.append('company_id', companyId.value);
+    formData.append('lost_ownership_document', lostOwnershipDocument.value ? '1' : '0');
 
     if (idCardImage.value) {
       formData.append('id_card_image', idCardImage.value, idCardImage.value.name);
     }
-    files.value.forEach((file) => {
-      formData.append('files[]', file, file.name);
-    });
+
+    if (ownershipDocument.value) {
+      formData.append('files[]', ownershipDocument.value, ownershipDocument.value.name);
+    }
 
     router.post('items/stolen', formData, {
-      preserveState: true,
-      onSuccess: () => {
-        toast({
-          title: 'Success',
-          description: 'Report submitted successfully!',
-        });
-      },
-      onError: (errors) => {
-        console.error(errors);
-        toast({ title: 'Error', description: 'Failed to submit report.' });
+      forceFormData: true,
+      onSuccess: () => toast({ title: 'Success', description: 'Report submitted.' }),
+      onError: (formErrors) => {
+        errors.value = formErrors;
+        toast({ title: 'Error', description: formErrors });
       },
     });
   }
+  const { coords, fetchAddress } = useLocation({
+    country,
+    city,
+    streetAddress,
+  });
 </script>
 
 <template>
@@ -185,22 +145,17 @@
 
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
       <div>
-        <Label for="product_name">Product Name</Label>
-        <Input id="product_name" v-model="productName" placeholder="Enter product name" :class="{ 'border-red-500': errors.productName }" />
-        <span v-if="errors.productName" class="text-sm text-red-500">{{ errors.productName }}</span>
-      </div>
-      <div>
-        <Label for="email">Email Address</Label>
-        <Input id="email" type="email" v-model="email" placeholder="Enter your email" :class="{ 'border-red-500': errors.email }" />
-        <span v-if="errors.email" class="text-sm text-red-500">{{ errors.email }}</span>
+        <Label for="customer_name">Customer Name</Label>
+        <Input id="customer_name" v-model="customerName" placeholder="Enter customer name" :class="{ 'border-red-500': errors.customer_name }" />
+        <span v-if="errors.customer_name" class="text-sm text-red-500">{{ errors.customer_name }}</span>
       </div>
       <div>
         <Label for="serial_code">Serial Code</Label>
-        <Input id="serial_code" v-model="serialCode" placeholder="Enter serial code" :class="{ 'border-red-500': errors.serialCode }" />
-        <span v-if="errors.serialCode" class="text-sm text-red-500">{{ errors.serialCode }}</span>
+        <Input id="serial_code" v-model="serialCode" placeholder="Enter serial code" :class="{ 'border-red-500': errors.serial_code }" />
+        <span v-if="errors.serial_code" class="text-sm text-red-500">{{ errors.serial_code }}</span>
       </div>
       <div>
-        <Label for="date_time">Stolen Date &amp; Time</Label>
+        <Label for="date_time">Stolen Date</Label>
         <DatePicker
           :value="dateTime"
           @modelValue="
@@ -209,7 +164,7 @@
             }
           "
         />
-        <span v-if="errors.dateTime" class="text-sm text-red-500">{{ errors.dateTime }}</span>
+        <span v-if="errors.date_time" class="text-sm text-red-500">{{ errors.date_time }}</span>
       </div>
       <div>
         <Label for="country">Country</Label>
@@ -223,22 +178,26 @@
       </div>
       <div>
         <Label for="street_address">Street Address</Label>
-        <Input id="street_address" v-model="streetAddress" placeholder="Enter street address" :class="{ 'border-red-500': errors.streetAddress }" />
-        <span v-if="errors.streetAddress" class="text-sm text-red-500">{{ errors.streetAddress }}</span>
+        <Input id="street_address" v-model="streetAddress" placeholder="Enter street address" :class="{ 'border-red-500': errors.street_address }" />
+        <span v-if="errors.street_address" class="text-sm text-red-500">{{ errors.street_address }}</span>
       </div>
       <div>
-        <Label for="purchase_location">Purchase Location</Label>
-        <Input
-          id="purchase_location"
-          v-model="purchaseLocation"
-          placeholder="Enter purchase location"
-          :class="{ 'border-red-500': errors.purchaseLocation }"
-        />
-        <span v-if="errors.purchaseLocation" class="text-sm text-red-500">{{ errors.purchaseLocation }}</span>
+        <Label for="company">Company</Label>
+        <Select id="company" v-model="companyId" :class="{ 'border-red-500': errors.company }">
+          <SelectTrigger>
+            <SelectValue placeholder="Select company" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem v-for="company in companies" :key="company.name" :value="company.id"> {{ company.name }} </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <span v-if="errors.company" class="text-sm text-red-500">{{ errors.company }}</span>
       </div>
       <div>
         <Label for="item_type">Item Type</Label>
-        <Select id="item_type" v-model="itemType" :class="{ 'border-red-500': errors.itemType }">
+        <Select id="item_type" v-model="itemType" :class="{ 'border-red-500': errors.item_type }">
           <SelectTrigger>
             <SelectValue placeholder="Select item" />
           </SelectTrigger>
@@ -248,20 +207,32 @@
             </SelectGroup>
           </SelectContent>
         </Select>
-        <span v-if="errors.itemType" class="text-sm text-red-500">{{ errors.itemType }}</span>
+        <span v-if="errors.item_type" class="text-sm text-red-500">{{ errors.itemType }}</span>
       </div>
       <div>
         <Label for="id_card_image">Upload ID Card</Label>
-        <Input id="id_card_image" type="file" accept="image/*" @change="handleIdCardImage" :class="{ 'border-red-500': errors.idCardImage }" />
-        <span v-if="errors.idCardImage" class="text-sm text-red-500">{{ errors.idCardImage }}</span>
+        <Input id="id_card_image" type="file" accept="image/*" @change="handleIdCardImage" :class="{ 'border-red-500': errors.id_card_image }" />
+        <span v-if="errors.id_card_image" class="text-sm text-red-500">{{ errors.id_card_image }}</span>
       </div>
       <div>
-        <Label for="files">Upload Files</Label>
-        <Input id="files" type="file" accept="image/*" multiple @change="handleFiles" :class="{ 'border-red-500': errors.files }" />
-        <span v-if="errors.files" class="text-sm text-red-500">{{ errors.files }}</span>
+        <Label for="ownership_document">Upload Ownership Document</Label>
+        <Input
+          id="ownership_document"
+          type="file"
+          accept="image/*"
+          @change="handleOwnershipDocument"
+          :class="{ 'border-red-500': errors.ownershipDocument }"
+          :disabled="lostOwnershipDocument"
+        />
+
+        <div class="mt-2 flex items-center">
+          <input type="checkbox" id="lost_ownership_document" v-model="lostOwnershipDocument" class="mr-2" />
+          <Label for="lost_ownership_document">I have lost the ownership document</Label>
+        </div>
+        <span v-if="errors.ownershipDocument" class="text-sm text-red-500">{{ errors.ownershipDocument }}</span>
       </div>
       <div
-        class="flex flex-col justify-end"
+        class="flex flex-col justify-center"
         @click="
           () => {
             fetchAddress(coords.latitude, coords.longitude, {

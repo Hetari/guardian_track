@@ -46,15 +46,21 @@
       phone: string;
     };
     type: string;
-    product_name: string;
+    customer_name: string;
     serial_code: string;
     date_time: string;
     country: string;
     city: string;
     street_address: string;
-    purchase_location: string;
     item_type: string;
     status: string;
+    company_id: string;
+    company?: {
+      id: string;
+      name: string;
+    };
+    tracking_code: string | null;
+    lost_ownership_document: boolean;
   }
 
   const { reports: data = [] } = defineProps<{
@@ -80,9 +86,31 @@
       enableSorting: false,
       enableHiding: false,
     }),
-    columnHelper.accessor('product_name', {
-      header: 'Product Name',
-      cell: ({ row }) => h('div', {}, row.original.product_name),
+    columnHelper.accessor('customer_name', {
+      header: 'Customer Name',
+      cell: ({ row }) => h('div', {}, row.original.customer_name),
+    }),
+    columnHelper.accessor('company.name', {
+      header: 'Company',
+      cell: ({ row }) => h('div', {}, row.original.company?.name || '-'),
+    }),
+    columnHelper.accessor('tracking_code', {
+      header: 'Tracking Code',
+      cell: ({ row }) => h('div', {}, row.original.tracking_code ?? '-'),
+    }),
+    columnHelper.accessor('lost_ownership_document', {
+      header: 'Lost Document',
+      cell: ({ row }) =>
+        h(
+          'div',
+          {
+            class: cn(
+              'w-fit rounded-full px-3 py-1 text-sm font-medium',
+              row.original.lost_ownership_document ? 'bg-red-500 text-white' : 'bg-green-500 text-white',
+            ),
+          },
+          row.original.lost_ownership_document ? 'Yes' : 'No',
+        ),
     }),
     columnHelper.accessor('type', {
       header: 'Report Type',
