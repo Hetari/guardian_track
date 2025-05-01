@@ -34,51 +34,56 @@
   const errors = ref<Record<string, string>>({});
 
   function validateForm(): boolean {
+    let isValid = true;
     errors.value = {};
-    let valid = true;
 
     if (!customerName.value) {
       errors.value.customerName = 'Required';
-      valid = false;
-    }
-    if (!serialCode.value) {
       errors.value.serialCode = 'Required';
-      valid = false;
-    }
-    if (!dateTime.value) {
-      errors.value.dateTime = 'Required';
-      valid = false;
-    }
-    if (!country.value) {
-      errors.value.country = 'Required';
-      valid = false;
-    }
-    if (!city.value) {
-      errors.value.city = 'Required';
-      valid = false;
-    }
-    if (!streetAddress.value) {
-      errors.value.streetAddress = 'Required';
-      valid = false;
-    }
-    if (!companyId.value) {
-      errors.value.companyId = 'Required';
-      valid = false;
-    }
-    if (!itemType.value) {
-      errors.value.itemType = 'Required';
-      valid = false;
-    }
-    if (!idCardImage.value) {
-      errors.value.idCardImage = 'Required';
-      valid = false;
-    }
-    if (!lostOwnershipDocument.value && !ownershipDocument.value) {
-      errors.value.ownershipDocument = 'Provide document or mark as lost';
-      valid = false;
+      isValid = false;
     }
 
-    return valid;
+    if (!dateTime.value) {
+      errors.value.dateTime = 'Required';
+      isValid = false;
+    }
+
+    if (!country.value) {
+      errors.value.country = 'Required';
+      isValid = false;
+    }
+
+    if (!city.value) {
+      errors.value.city = 'Required';
+      isValid = false;
+    }
+
+    if (!streetAddress.value) {
+      errors.value.streetAddress = 'Required';
+      isValid = false;
+    }
+
+    if (!companyId.value) {
+      errors.value.companyId = 'Required';
+      isValid = false;
+    }
+
+    if (!itemType.value) {
+      errors.value.itemType = 'Required';
+      isValid = false;
+    }
+
+    if (!idCardImage.value) {
+      errors.value.idCardImage = 'Required';
+      isValid = false;
+    }
+
+    if (!lostOwnershipDocument.value && !ownershipDocument.value) {
+      errors.value.ownershipDocument = 'Provide document or mark as lost';
+      isValid = false;
+    }
+
+    return isValid;
   }
 
   function handleIdCardImage(e: Event) {
@@ -119,7 +124,11 @@
 
     router.post('items/stolen', formData, {
       forceFormData: true,
-      onSuccess: () => toast({ title: 'Success', description: 'Report submitted.' }),
+      onSuccess: (p) => {
+        console.log(p);
+
+        toast({ title: 'Success', description: 'Report submitted.' });
+      },
       onError: (formErrors) => {
         errors.value = formErrors;
         toast({ title: 'Error', description: formErrors.message });
@@ -135,7 +144,6 @@
 
 <template>
   <Toaster />
-
   <div class="mt-2 hidden w-[340px] rounded-md bg-slate-950 p-4"></div>
   <section class="body-font container relative mx-auto py-10 sm:py-10">
     <div class="col-span-full flex items-center justify-between pb-10 text-4xl font-bold text-[#ddd] sm:text-5xl md:text-8xl">
@@ -146,17 +154,17 @@
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
       <div>
         <Label for="customer_name">Customer Name</Label>
-        <Input id="customer_name" v-model="customerName" placeholder="Enter customer name" :class="{ 'border-red-500': errors.customer_name }" />
-        <span v-if="errors.customer_name" class="text-sm text-red-500">{{ errors.customer_name }}</span>
+        <Input id="customer_name" v-model="customerName" placeholder="Enter customer name" :class="{ 'border-red-500': errors.customerName }" />
+        <span v-if="errors.customerName" class="text-sm text-red-500">{{ errors.customerName }}</span>
       </div>
       <div>
         <Label for="serial_code">Serial Code</Label>
         <Input id="serial_code" v-model="serialCode" placeholder="Enter serial code" :class="{ 'border-red-500': errors.serial_code }" />
-        <span v-if="errors.serial_code" class="text-sm text-red-500">{{ errors.serial_code }}</span>
+        <span v-if="errors.serialCode" class="text-sm text-red-500">{{ errors.serialCode }}</span>
       </div>
       <div>
         <Label for="date_time">Stolen Date</Label>
-        <InputDatePicker v-model="dateTime" />
+        <InputDatePicker class="w-full" v-model="dateTime" placeholder="Enter the date and time" />
         <!-- <DatePicker
           :value="dateTime"
           @modelValue="
@@ -165,7 +173,7 @@
             }
           "
         /> -->
-        <span v-if="errors.date_time" class="text-sm text-red-500">{{ errors.date_time }}</span>
+        <span v-if="errors.dateTime" class="text-sm text-red-500">{{ errors.dateTime }}</span>
       </div>
       <div>
         <Label for="country">Country</Label>
@@ -179,8 +187,8 @@
       </div>
       <div>
         <Label for="street_address">Street Address</Label>
-        <Input id="street_address" v-model="streetAddress" placeholder="Enter street address" :class="{ 'border-red-500': errors.street_address }" />
-        <span v-if="errors.street_address" class="text-sm text-red-500">{{ errors.street_address }}</span>
+        <Input id="street_address" v-model="streetAddress" placeholder="Enter street address" :class="{ 'border-red-500': errors.streetAddress }" />
+        <span v-if="errors.streetAddress" class="text-sm text-red-500">{{ errors.streetAddress }}</span>
       </div>
       <div>
         <Label for="company">Company</Label>
@@ -198,7 +206,7 @@
       </div>
       <div>
         <Label for="item_type">Item Type</Label>
-        <Select id="item_type" v-model="itemType" :class="{ 'border-red-500': errors.item_type }">
+        <Select id="item_type" v-model="itemType" :class="{ 'border-red-500': errors.itemType }">
           <SelectTrigger>
             <SelectValue placeholder="Select item" />
           </SelectTrigger>
@@ -208,12 +216,12 @@
             </SelectGroup>
           </SelectContent>
         </Select>
-        <span v-if="errors.item_type" class="text-sm text-red-500">{{ errors.itemType }}</span>
+        <span v-if="errors.itemType" class="text-sm text-red-500">{{ errors.itemType }}</span>
       </div>
       <div>
         <Label for="id_card_image">Upload ID Card</Label>
-        <Input id="id_card_image" type="file" accept="image/*" @change="handleIdCardImage" :class="{ 'border-red-500': errors.id_card_image }" />
-        <span v-if="errors.id_card_image" class="text-sm text-red-500">{{ errors.id_card_image }}</span>
+        <Input id="id_card_image" type="file" accept="image/*" @change="handleIdCardImage" :class="{ 'border-red-500': errors.idCardImage }" />
+        <span v-if="errors.idCardImage" class="text-sm text-red-500">{{ errors.idCardImage }}</span>
       </div>
       <div>
         <Label for="ownership_document">Upload Ownership Document</Label>

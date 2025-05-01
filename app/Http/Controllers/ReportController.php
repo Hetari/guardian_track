@@ -28,6 +28,14 @@ class ReportController extends Controller
         ]);
     }
 
+    public function submitted($tracking_code)
+    {
+        dd($tracking_code);
+        return Inertia::render('Reports/Submitted', [
+            'tracking_code' => $tracking_code,
+        ]);
+    }
+
     public function status()
     {
         $status = [
@@ -65,6 +73,7 @@ class ReportController extends Controller
 
     public function store(Request $request)
     {
+
         $request->merge([
             'date_time' => preg_replace('/\s*\(.*\)$/', '', $request->input('date_time')),
         ]);
@@ -80,12 +89,10 @@ class ReportController extends Controller
             'street_address' => 'required|string',
             'company_id' => 'nullable|exists:partner_companies,id',
             'lost_ownership_document' => 'boolean',
-            'files.*' => 'nullable|file|mimes:jpg,png,pdf',
-            'id_card_image' => 'nullable|file|mimes:jpg,png,pdf',
+            'files.*' => 'nullable|file|mimes:jpg,png,pdf,webp',
+            'id_card_image' => 'nullable|file|mimes:jpg,png,pdf,webp',
             'tracking_code' => 'nullable|string|unique:reports,tracking_code',
         ]);
-
-        dd($data);
 
         // TODO: if there is no tracking_code generate it
         if (empty($data['tracking_code'])) {
@@ -98,10 +105,12 @@ class ReportController extends Controller
             return redirect()->route('login');
         }
 
+
         $report = Report::create($data);
         if (!$report) {
             return response()->json(['message' => 'Failed to create report'], 500);
         }
+
 
         if ($request->hasFile('id_card_image')) {
             $path = $request->file('id_card_image')->store('uploads', 'public');
@@ -123,7 +132,9 @@ class ReportController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Lost item reported successfully.');
+        return Inertia::render('Reports/Submitted', [
+            'tracking_code' => $report->tracking_code,
+        ]);
     }
 
     public function destroy($id)
