@@ -246,8 +246,8 @@
           <Input
             class="max-w-sm"
             placeholder="Filter prduct names..."
-            :model-value="table.getColumn('product_name')?.getFilterValue() as string"
-            @update:model-value="table.getColumn('product_name')?.setFilterValue($event)"
+            :model-value="table.getColumn('customer_name')?.getFilterValue() as string"
+            @update:model-value="table.getColumn('customer_name')?.setFilterValue($event)"
           />
           <DropdownMenu>
             <DropdownMenuTrigger as-child>

@@ -16,7 +16,8 @@ class PartnerCompany extends Model
      */
     protected $fillable = [
         'name',
-        'active'
+        'active',
+        'email'
     ];
 
     protected $casts = [

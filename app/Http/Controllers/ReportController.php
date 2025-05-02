@@ -51,21 +51,7 @@ class ReportController extends Controller
 
         $currentUser = auth()->user();
         $reports = $currentUser->reports()
-            ->select(
-                'id',
-                'type',
-                'customer_name',
-                'serial_code',
-                'date_time',
-                'country',
-                'city',
-                'street_address',
-                'item_type',
-                'status',
-                'company_id',
-                'lost_ownership_document',
-                'tracking_code'
-            )
+            ->with(['company'])
             ->get();
 
         return Inertia::render('Reports/Status', [

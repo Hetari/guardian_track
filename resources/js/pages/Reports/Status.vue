@@ -1,4 +1,17 @@
 <script setup lang="ts">
+  import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from '@/components/ui/alert-dialog';
+  import { cn } from '@/lib/utils';
+  import { useTimeAgo } from '@vueuse/core';
   defineProps<{
     statuses: {
       [key: string]: string;
@@ -6,17 +19,30 @@
     reports: {
       id: string;
       type: string;
-      product_name: string;
+      customer_name: string;
       serial_code: string;
+      tracking_code: string;
       date_time: string;
       country: string;
       city: string;
       street_address: string;
-      purchase_location: string;
       item_type: string;
+      lost_ownership_document: boolean;
+      company: {
+        name: string;
+        active: boolean;
+        email: string;
+      };
       status: string;
+      updated_at: string;
+      created_at: string;
     }[];
   }>();
+
+  const cancelReport = (id: string) => {
+    if (confirm('Are you sure you want to cancel this report?')) {
+    }
+  };
 </script>
 <template>
   <section class="body-font container relative mx-auto py-10 sm:py-10">
@@ -25,26 +51,38 @@
       <Link class="rounded-full bg-[#333] px-3 py-2 text-sm md:px-6" :href="route('logout')">Logout </Link>
     </div>
 
-    <div class="grid grid-cols-3 gap-4" v-if="reports && reports.length">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" v-if="reports && reports.length">
       <div v-for="report in reports" :key="report.id" class="rounded-2xl border border-[#333] bg-[#1F1F1F] p-6 shadow-xl backdrop-blur-lg">
         <div class="flex flex-col space-y-4">
           <!-- Report Details -->
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <h3 class="text-2xl font-semibold leading-none text-gray-300">{{ report.product_name }}</h3>
-              <p class="text-xs font-semibold text-[#ddd] opacity-50">Product Name</p>
+              <p class="text-sm font-semibold text-[#ddd] opacity-50">Customer Name</p>
+              <h3 class="text-sm font-semibold text-gray-300">{{ report.customer_name }}</h3>
             </div>
             <div>
-              <h3 class="text-2xl font-semibold leading-none text-gray-300">{{ report.serial_code }}</h3>
-              <p class="text-xs font-semibold text-[#ddd] opacity-50">Serial Code</p>
+              <p class="text-sm font-semibold text-[#ddd] opacity-50">Serial Code</p>
+              <h3 class="text-sm font-semibold text-gray-300">{{ report.serial_code }}</h3>
             </div>
             <div>
-              <h3 class="text-2xl font-semibold leading-none text-gray-300">{{ new Date(report.date_time).toLocaleDateString() }}</h3>
-              <p class="text-xs font-semibold text-[#ddd] opacity-50">Date</p>
+              <p class="text-sm font-semibold text-[#ddd] opacity-50">Tracking Code</p>
+              <h3 class="text-sm font-semibold text-gray-300">{{ report.tracking_code }}</h3>
             </div>
             <div>
-              <h3 class="text-2xl font-semibold leading-none text-gray-300">{{ report.type }}</h3>
-              <p class="text-xs font-semibold text-[#ddd] opacity-50">Type</p>
+              <p class="text-sm font-semibold text-[#ddd] opacity-50">Date</p>
+              <h3 class="text-sm font-semibold text-gray-300">{{ new Date(report.date_time).toLocaleDateString() }}</h3>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-[#ddd] opacity-50">Type</p>
+              <h3 class="text-sm font-semibold text-gray-300">{{ report.type }}</h3>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-[#ddd] opacity-50">Ownership Document Lost</p>
+              <h3 class="text-sm font-semibold text-gray-300">{{ report.lost_ownership_document ? 'Yes' : 'No' }}</h3>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-[#ddd] opacity-50">Company Name</p>
+              <h3 class="text-sm font-semibold text-gray-300">#{{ report.company.name }}</h3>
             </div>
           </div>
 
@@ -70,10 +108,62 @@
               </li>
             </ol>
           </div>
+
+          <!--  -->
+          <div class="border-t border-[#333] pt-4 text-sm text-gray-400">
+            <p>
+              Handled by: <span class="font-medium text-gray-200">{{ report.company.name }}</span>
+            </p>
+            <p>
+              Last edit on:
+              <span class="font-medium text-gray-200">{{ useTimeAgo(new Date(report.updated_at).toLocaleString()) }}</span>
+            </p>
+          </div>
+
+          <!-- Contact Support Box -->
+          <div class="mt-6 rounded-lg border border-blue-500 bg-[#1A1F2A] p-4 text-blue-300">
+            <h4 class="mb-2 font-semibold text-blue-400">Need Help?</h4>
+            <p class="mb-3 text-sm">You can contact customer support directly via email.</p>
+            <a
+              :href="`mailto:${report.company.email}`"
+              class="inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+            >
+              Contact Support
+            </a>
+          </div>
+
+          <!-- Cancel Report Box -->
+          <!-- Cancel Report Dialog -->
+          <AlertDialog>
+            <AlertDialogTrigger
+              class="mt-6 inline-block rounded-md border border-red-500 bg-[#2A1A1A] px-4 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-600 hover:text-white"
+            >
+              Cancel Report
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Cancel This Report?</AlertDialogTitle>
+                <AlertDialogDescription :class="cn('text-sm text-gray-400')">
+                  If you've already found the lost item, you can cancel this report. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel :class="cn('rounded-md border border-gray-600 px-4 py-2 text-sm text-white hover:bg-gray-700')">
+                  Keep Report
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  @click="cancelReport(report.id)"
+                  :class="cn('rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700')"
+                >
+                  Confirm Cancel
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>
-    <div v-else class="flex min-h-[70vh] items-center justify-center text-center text-2xl text-gray-500">
+    <div v-else class="flex min-h-[70vh] items-center justify-center text-center text-sm text-gray-500">
       <p>No reports found.</p>
     </div>
   </section>
