@@ -3,14 +3,33 @@
   import { Button } from '@/components/ui/button';
   import { Input } from '@/components/ui/input';
   import { Label } from '@/components/ui/label';
+  import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
   import AuthBase from '@/layouts/AuthLayout.vue';
   import { Head, useForm } from '@inertiajs/vue3';
+  import { tryOnBeforeMount } from '@vueuse/core';
   import { LoaderCircle } from 'lucide-vue-next';
+  import { ref } from 'vue';
+
+  interface Country {
+    name: {
+      common: string;
+    };
+    cca2: string;
+  }
+
+  const allCountries = ref<Country[]>([]);
+
+  tryOnBeforeMount(async () => {
+    const res = await fetch('https://restcountries.com/v3.1/all');
+    const data = await res.json();
+    allCountries.value = data.sort((a: any, b: any) => a?.name?.common?.localeCompare(b?.name?.common));
+  });
 
   const form = useForm({
     name: '',
     email: '',
     phone: '',
+    country: '',
     password: '',
     password_confirmation: '',
   });
@@ -28,7 +47,7 @@
     <Head title="Register" />
 
     <form @submit.prevent="submit" class="flex flex-col gap-6">
-      <div class="grid gap-6">
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div class="grid gap-2">
           <Label for="name">Name</Label>
           <Input id="name" type="text" required autofocus :tabindex="1" autocomplete="name" v-model="form.name" placeholder="Full name" />
@@ -45,6 +64,23 @@
           <Label for="phone">Phone Number</Label>
           <Input id="phone" type="number" required :tabindex="2" autocomplete="phone" v-model="form.phone" placeholder="123xxxxxx" />
           <InputError :message="form.errors.phone" />
+        </div>
+
+        <div class="grid gap-2">
+          <Label for="country">Country</Label>
+          <Select aria-keyshortcuts="false" v-model="form.country">
+            <SelectTrigger id="country">
+              <SelectValue placeholder="Select your country" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem v-for="country in allCountries" :key="country.cca2" :value="country.name.common">
+                  {{ country.name.common }}
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <InputError :message="form.errors.country" />
         </div>
 
         <div class="grid gap-2">
@@ -67,7 +103,7 @@
           <InputError :message="form.errors.password_confirmation" />
         </div>
 
-        <Button type="submit" class="mt-2 w-full" tabindex="5" :disabled="form.processing">
+        <Button type="submit" class="col-span-2 mt-2 w-full" tabindex="5" :disabled="form.processing">
           <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
           Create account
         </Button>

@@ -37,6 +37,7 @@ class RegisteredUserController extends Controller
             'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'phone' => 'required|string|max:255',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'country' => 'required|string|max:255',
         ]);
 
         $user = User::create([
@@ -44,6 +45,7 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
+            'country' => $request->country,
         ]);
 
         // Generate the signed URL for email verification

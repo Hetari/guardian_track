@@ -180,6 +180,7 @@
             :model-value="table.getColumn('email')?.getFilterValue() as string"
             @update:model-value="table.getColumn('email')?.setFilterValue($event)"
           />
+          <Button @click="() => router.get('/register')">Add User</Button>
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
               <Button variant="outline" class="ml-auto"> Columns <ChevronDown class="ml-2 h-4 w-4" /> </Button>
