@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@test.com',
             'password' => bcrypt('123456'),
             'phone' => '1234567890',
-
+            'country' => 'USA',
         ]);
         User::factory()->create([
             'name' => 'Admin',
@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('123456'),
             'role' => 'admin',
             'phone' => '1234567891',
+            'country' => 'USA',
         ]);
 
         PartnerCompany::create(['name' => 'Company A', 'active' => true, 'email' => 'company1@a.com']);

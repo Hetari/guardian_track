@@ -42,6 +42,7 @@
     email: string;
     phone: string;
     reports_count: number;
+    country: string;
   }
 
   const { users: data = [] } = defineProps<{
@@ -82,12 +83,25 @@
       cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('email')),
     }),
     columnHelper.accessor('name', {
-      header: 'Name',
+      header: ({ column }) => {
+        return h(
+          Button,
+          {
+            variant: 'ghost',
+            onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+          },
+          () => ['Name', h(ChevronsUpDown, { class: 'ml-2 h-4 w-4' })],
+        );
+      },
       cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('name')),
     }),
     columnHelper.accessor('phone', {
       header: 'Phone',
       cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('phone')),
+    }),
+    columnHelper.accessor('country', {
+      header: 'Country',
+      cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('country')),
     }),
     columnHelper.accessor('reports_count', {
       header: 'Reports',
