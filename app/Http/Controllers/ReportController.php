@@ -17,7 +17,10 @@ class ReportController extends Controller
     }
     public function lost()
     {
-        return Inertia::render('Reports/Lost');
+        $companies = PartnerCompany::all();
+        return Inertia::render('Reports/Lost', [
+            'companies' => $companies,
+        ]);
     }
 
     public function stolen()
