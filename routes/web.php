@@ -17,6 +17,7 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' 
     Route::get('/lost', [ReportController::class, 'lost'])->name('lost');
     Route::get('/stolen', [ReportController::class, 'stolen'])->name('stolen');
     Route::get('/submitted/{tracking_code}', [ReportController::class, 'submitted'])->name('submitted');
+    Route::delete('/delete/{id}', [ReportController::class, 'destroy'])->name('delete');
 
     Route::group(['prefix' => 'items'], function () {
         Route::post('/stolen', [ReportController::class, 'store'])->name('stolen.store');

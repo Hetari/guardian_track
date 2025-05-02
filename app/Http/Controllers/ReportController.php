@@ -126,11 +126,12 @@ class ReportController extends Controller
         ]);
     }
 
+
     public function destroy($id)
     {
         $report = Report::findOrFail($id);
         $report->delete();
-        return response()->json(['message' => 'Report deleted successfully']);
+        return redirect()->route('reports.status')->with('success', 'Report deleted successfully');
     }
 
     private function storeBase64Image($base64Image)

@@ -32,7 +32,7 @@ const date = defineModel();
             </PopoverTrigger>
 
             <PopoverContent align="start" class="w-auto p-0">
-                <Calendar v-model="date" locale="pt-BR" initial-focus />
+                <Calendar v-model="date" initial-focus />
             </PopoverContent>
         </Popover>
     </div>

@@ -11,6 +11,7 @@
     AlertDialogTrigger,
   } from '@/components/ui/alert-dialog';
   import { cn } from '@/lib/utils';
+  import { router } from '@inertiajs/vue3';
   import { useTimeAgo } from '@vueuse/core';
   defineProps<{
     statuses: {
@@ -40,8 +41,8 @@
   }>();
 
   const cancelReport = (id: string) => {
-    if (confirm('Are you sure you want to cancel this report?')) {
-    }
+    router.delete(route('reports.delete', id));
+    router.reload();
   };
 </script>
 <template>
