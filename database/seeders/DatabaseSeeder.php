@@ -31,8 +31,12 @@ class DatabaseSeeder extends Seeder
             'phone' => '1234567891',
         ]);
 
-        PartnerCompany::create(['name' => 'Company A', 'active' => true]);
-        PartnerCompany::create(['name' => 'Company B', 'active' => false]);
-        PartnerCompany::create(['name' => 'Company C', 'active' => true]);
+        PartnerCompany::create(['name' => 'Company A', 'active' => true, 'email' => 'company1@a.com']);
+        PartnerCompany::create(['name' => 'Company B', 'active' => false, 'email' => 'company2@a.com']);
+        PartnerCompany::create([
+            'name' => 'Company C',
+            'active' => true,
+            'email' => 'company3@a.com'
+        ]);
     }
 }
