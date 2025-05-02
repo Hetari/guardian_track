@@ -28,6 +28,7 @@ class ReportManagementController extends Controller
                 'lost_ownership_document',
                 'tracking_code'
             )
+            ->latest('created_at')
             ->get();
 
         return Inertia::render('Dashboard/Reports', [
@@ -39,27 +40,23 @@ class ReportManagementController extends Controller
     {
         $validated = $request->validate([
             'id' => 'required|exists:reports,id',
-            'city' => 'required|string',
-            'country' => 'required|string',
-            'date_time' => 'required|date|before:now',
-            'item_type' => 'required|in:Bag,Shoe,Watch,Other',
-            'street_address' => 'required|string',
-            'type' => 'required|in:stolen,lost',
             'customer_name' => 'required|string|max:255',
-            'serial_code' => 'required|string',
+            'serial_code' => 'required|string|max:255',
+            'date_time' => 'required|date|before:now',
+            'country' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'street_address' => 'required|string|max:255',
+            'item_type' => 'required|in:Bag,Shoe,Watch,Other',
+            'type' => 'required|in:stolen,lost',
             'status' => 'required|string',
             'company_id' => 'nullable|exists:partner_companies,id',
-            'lost_ownership_document' => 'boolean',
-            'tracking_code' => 'required|string|unique:reports,tracking_code,' . $request->id,
-            'files.*' => 'nullable|file|mimes:jpg,png,pdf',
-            'id_card_image' => 'nullable|file|mimes:jpg,png,pdf',
+            'lost_ownership_document' => 'required|boolean',
+            'tracking_code' => 'required|string|max:255|unique:reports,tracking_code,' . $request->id,
+            'files.*' => 'nullable|file|mimes:jpg,png,pdf|max:2048',
+            'id_card_image' => 'nullable|file|mimes:jpg,png,pdf|max:2048',
         ]);
 
-        $report = Report::find($validated['id']);
-        if (!$report) {
-            return back()->withErrors(['report' => 'Report not found']);
-        }
-
+        $report = Report::findOrFail($validated['id']);
         $report->update($validated);
 
         return Inertia::location(route('reports'));
