@@ -16,6 +16,8 @@
     FlexRender,
     getCoreRowModel,
     getExpandedRowModel,
+    getFacetedMinMaxValues,
+    getFacetedRowModel,
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
@@ -68,6 +70,8 @@
       },
       enableSorting: false,
       enableHiding: false,
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('email', {
       header: ({ column }) => {
@@ -81,6 +85,8 @@
         );
       },
       cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('email')),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('name', {
       header: ({ column }) => {
@@ -94,14 +100,20 @@
         );
       },
       cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('name')),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('phone', {
       header: 'Phone',
       cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('phone')),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('country', {
       header: 'Country',
       cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('country')),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('reports_count', {
       header: 'Reports',
@@ -143,30 +155,43 @@
   ];
 
   const sorting = ref<SortingState>([]);
-  const columnFilters = ref<ColumnFiltersState>([]);
   const columnVisibility = ref<VisibilityState>({});
   const rowSelection = ref({});
   const expanded = ref<ExpandedState>({});
+  const columnFilters = ref<ColumnFiltersState>([]);
+  const globalFilter = ref('');
 
   const table = useVueTable({
     data,
     columns,
+    onColumnFiltersChange: (updaterOrValue) => {
+      columnFilters.value = typeof updaterOrValue === 'function' ? updaterOrValue(columnFilters.value) : updaterOrValue;
+    },
+    onGlobalFilterChange: (updaterOrValue) => {
+      globalFilter.value = typeof updaterOrValue === 'function' ? updaterOrValue(globalFilter.value) : updaterOrValue;
+    },
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
+
     onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
-    onColumnFiltersChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnFilters),
+
     onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
     onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
     onExpandedChange: (updaterOrValue) => valueUpdater(updaterOrValue, expanded),
     state: {
-      get sorting() {
-        return sorting.value;
-      },
       get columnFilters() {
         return columnFilters.value;
+      },
+      get globalFilter() {
+        return globalFilter.value;
+      },
+      get sorting() {
+        return sorting.value;
       },
       get columnVisibility() {
         return columnVisibility.value;

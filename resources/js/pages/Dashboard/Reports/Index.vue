@@ -16,6 +16,8 @@
     FlexRender,
     getCoreRowModel,
     getExpandedRowModel,
+    getFacetedMinMaxValues,
+    getFacetedRowModel,
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
@@ -69,7 +71,7 @@
 
   const columnHelper = createColumnHelper<Report>();
   const columns = [
-    columnHelper.display({
+    columnHelper.group({
       id: 'select',
       header: ({ table }) =>
         h(Checkbox, {
@@ -83,20 +85,26 @@
           'onUpdate:modelValue': (value) => row.toggleSelected(!!value),
           ariaLabel: 'Select row',
         }),
-      enableSorting: false,
-      enableHiding: false,
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('customer_name', {
       header: 'Customer Name',
       cell: ({ row }) => h('div', {}, row.original.customer_name),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('company.name', {
       header: 'Company',
       cell: ({ row }) => h('div', {}, row.original.company?.name || '-'),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('tracking_code', {
       header: 'Tracking Code',
       cell: ({ row }) => h('div', {}, row.original.tracking_code ?? '-'),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('lost_ownership_document', {
       header: 'Lost Document',
@@ -111,6 +119,8 @@
           },
           row.original.lost_ownership_document ? 'Yes' : 'No',
         ),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('type', {
       header: 'Report Type',
@@ -125,22 +135,32 @@
           },
           row.original.type,
         ),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('serial_code', {
       header: 'Serial Code',
       cell: ({ row }) => h('div', {}, row.original.serial_code),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('date_time', {
       header: 'Date & Time',
       cell: ({ row }) => h('div', {}, new Date(row.original.date_time).toLocaleString()),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('country', {
       header: 'Country',
       cell: ({ row }) => h('div', {}, row.original.country),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('city', {
       header: 'City',
       cell: ({ row }) => h('div', {}, row.original.city),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     }),
     columnHelper.accessor('status', {
       header: 'Status',
@@ -198,30 +218,43 @@
   ];
 
   const sorting = ref<SortingState>([]);
-  const columnFilters = ref<ColumnFiltersState>([]);
   const columnVisibility = ref<VisibilityState>({});
   const rowSelection = ref({});
   const expanded = ref<ExpandedState>({});
+  const columnFilters = ref<ColumnFiltersState>([]);
+  const globalFilter = ref('');
 
   const table = useVueTable({
     data,
     columns,
+    onColumnFiltersChange: (updaterOrValue) => {
+      columnFilters.value = typeof updaterOrValue === 'function' ? updaterOrValue(columnFilters.value) : updaterOrValue;
+    },
+    onGlobalFilterChange: (updaterOrValue) => {
+      globalFilter.value = typeof updaterOrValue === 'function' ? updaterOrValue(globalFilter.value) : updaterOrValue;
+    },
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
+
     onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
-    onColumnFiltersChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnFilters),
+
     onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
     onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
     onExpandedChange: (updaterOrValue) => valueUpdater(updaterOrValue, expanded),
     state: {
-      get sorting() {
-        return sorting.value;
-      },
       get columnFilters() {
         return columnFilters.value;
+      },
+      get globalFilter() {
+        return globalFilter.value;
+      },
+      get sorting() {
+        return sorting.value;
       },
       get columnVisibility() {
         return columnVisibility.value;
@@ -243,12 +276,7 @@
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
       <div class="w-full">
         <div class="flex items-center gap-2 py-4">
-          <Input
-            class="max-w-sm"
-            placeholder="Filter prduct names..."
-            :model-value="table.getColumn('customer_name')?.getFilterValue() as string"
-            @update:model-value="table.getColumn('customer_name')?.setFilterValue($event)"
-          />
+          <Input class="max-w-sm" placeholder="Search reports..." v-model="globalFilter" />
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
               <Button variant="outline" class="ml-auto"> Columns <ChevronDown class="ml-2 h-4 w-4" /> </Button>
