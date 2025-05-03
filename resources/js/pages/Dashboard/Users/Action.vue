@@ -31,6 +31,27 @@
                   </FormItem>
                 </FormField>
 
+                <FormField name="country">
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <FormControl>
+                      <Select :model-value="user.country" @update:model-value="(val) => (user.country = (val as string) ?? '')">
+                        <SelectTrigger id="country">
+                          <SelectValue placeholder="Select your country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem v-for="country in allCountries" :key="country.cca2" :value="country.name.common">
+                              {{ country.name.common }}
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+
                 <FormField v-slot="{ componentField }" name="phone">
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
@@ -64,7 +85,9 @@
   import { Dialog, DialogContent, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
   import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
   import { Input } from '@/components/ui/input';
+  import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
   import { toTypedSchema } from '@vee-validate/zod';
+  import { tryOnBeforeMount } from '@vueuse/core';
   import { ref, watchEffect } from 'vue';
   import * as z from 'zod';
 
@@ -73,10 +96,11 @@
       username: z.string().min(2).max(50),
       email: z.string().email(),
       phone: z.string().optional(),
+      country: z.string().optional(),
     }),
   );
 
-  const user = ref({ name: '', email: '', phone: '' });
+  const user = ref<{ name: string; email: string; phone?: string; country: string }>({ name: '', email: '', phone: '', country: '' });
 
   const { actions = [] } = defineProps<{
     actions: {
@@ -92,8 +116,21 @@
     formSchema.parse(user.value);
     func(user.value);
     // Reset user data after submission
-    user.value = { name: '', email: '', phone: '' };
+    user.value = { name: '', email: '', phone: '', country: '' };
   };
+
+  interface Country {
+    name: {
+      common: string;
+    };
+    cca2: string;
+  }
+  const allCountries = ref<Country[]>([]);
+  tryOnBeforeMount(async () => {
+    const res = await fetch('https://restcountries.com/v3.1/all');
+    const data = await res.json();
+    allCountries.value = data.sort((a: any, b: any) => a?.name?.common?.localeCompare(b?.name?.common));
+  });
 
   // Update user info when the dialog opens
   watchEffect(() => {

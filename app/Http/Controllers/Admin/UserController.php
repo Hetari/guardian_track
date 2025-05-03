@@ -13,7 +13,7 @@ class UserController extends Controller
     {
         $users = User::withCount('reports')->get();
 
-        return Inertia::render('Dashboard/Users', [
+        return Inertia::render('Dashboard/Users/Index', [
             'users' => $users,
         ]);
     }
@@ -25,6 +25,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => 'required|string|max:255',
+            'country' => 'required|string|max:255',
         ]);
 
         $user = User::find($validated['id']);
@@ -34,7 +35,7 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return Inertia::location(route('users'));
+        return Inertia::location(route('dashboard.users.index'));
     }
 
     public function delete($id)
@@ -46,6 +47,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return Inertia::location(route('users'));
+        return Inertia::location(route('dashboard.users.index'));
     }
 }
