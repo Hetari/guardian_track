@@ -31,7 +31,7 @@ class ReportManagementController extends Controller
             ->latest('created_at')
             ->get();
 
-        return Inertia::render('Dashboard/Reports', [
+        return Inertia::render('Dashboard/Reports/Index', [
             'reports' => $reports,
         ]);
     }
@@ -40,26 +40,26 @@ class ReportManagementController extends Controller
     {
         $validated = $request->validate([
             'id' => 'required|exists:reports,id',
-            'customer_name' => 'required|string|max:255',
-            'serial_code' => 'required|string|max:255',
-            'date_time' => 'required|date|before:now',
-            'country' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'street_address' => 'required|string|max:255',
-            'item_type' => 'required|in:Bag,Shoe,Watch,Other',
-            'type' => 'required|in:stolen,lost',
             'status' => 'required|string',
-            'company_id' => 'nullable|exists:partner_companies,id',
-            'lost_ownership_document' => 'required|boolean',
-            'tracking_code' => 'required|string|max:255|unique:reports,tracking_code,' . $request->id,
-            'files.*' => 'nullable|file|mimes:jpg,png,pdf|max:2048',
-            'id_card_image' => 'nullable|file|mimes:jpg,png,pdf|max:2048',
+            // 'customer_name' => 'required|string|max:255',
+            // 'serial_code' => 'required|string|max:255',
+            // 'date_time' => 'required|date|before:now',
+            // 'country' => 'required|string|max:255',
+            // 'city' => 'required|string|max:255',
+            // 'street_address' => 'required|string|max:255',
+            // 'item_type' => 'required|in:Bag,Shoe,Watch,Other',
+            // 'type' => 'required|in:stolen,lost',
+            // 'company_id' => 'nullable|exists:partner_companies,id',
+            // 'lost_ownership_document' => 'required|boolean',
+            // 'tracking_code' => 'required|string|max:255|unique:reports,tracking_code,' . $request->id,
+            // 'files.*' => 'nullable|file|mimes:jpg,png,pdf|max:2048',
+            // 'id_card_image' => 'nullable|file|mimes:jpg,png,pdf|max:2048',
         ]);
 
         $report = Report::findOrFail($validated['id']);
         $report->update($validated);
 
-        return Inertia::location(route('reports'));
+        return Inertia::location(route('dashboard.reports.index'));
     }
 
     public function delete($id)
@@ -71,6 +71,6 @@ class ReportManagementController extends Controller
 
         $report->delete();
 
-        return Inertia::location(route('reports'));
+        return Inertia::location(route('dashboard.reports.index'));
     }
 }

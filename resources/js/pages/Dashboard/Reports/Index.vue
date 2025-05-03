@@ -23,7 +23,7 @@
   } from '@tanstack/vue-table';
   import { ChevronDown } from 'lucide-vue-next';
   import { h, ref } from 'vue';
-  import Action from './Users/Action.vue';
+  import Action from './Action.vue';
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
