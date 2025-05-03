@@ -16,8 +16,8 @@ const date = defineModel();
 
 <template>
     <div>
-        <Popover side="left">
-            <PopoverTrigger as-child>
+        <Popover :side="'top'" data-side="top" class=" w-full">
+            <PopoverTrigger class="w-full" asChild>
                 <Button
                     type="button"
                     variant="outline"
@@ -31,7 +31,7 @@ const date = defineModel();
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent align="start" class="w-auto p-0">
+            <PopoverContent align="center" class="w-auto p-0">
                 <Calendar v-model="date" initial-focus />
             </PopoverContent>
         </Popover>

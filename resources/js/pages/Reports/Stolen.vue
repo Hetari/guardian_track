@@ -144,7 +144,6 @@
 
 <template>
   <Toaster />
-  <div class="mt-2 hidden w-[340px] rounded-md bg-slate-950 p-4"></div>
   <section class="body-font container relative mx-auto py-10 sm:py-10">
     <div class="col-span-full flex items-center justify-between pb-10 text-4xl font-bold text-[#ddd] sm:text-5xl md:text-8xl">
       <h1>Stolen Report</h1>

@@ -1,7 +1,7 @@
 <template>
-  <div class="1 container z-[999999] mx-auto h-full space-y-10 px-6 text-start md:grid md:grid-cols-3 md:gap-10 md:space-y-0 md:px-12">
-    <div class="md:col-span-2">
-      <h1 class="text-2xl font-bold md:text-5xl lg:text-7xl xl:text-9xl">
+  <div class="container z-[999999] mx-auto h-full space-y-10 px-6 text-start md:grid md:grid-cols-3 md:gap-10 md:space-y-0 md:px-12">
+    <div class="w-full place-content-center md:col-span-2">
+      <h1 class="text-2xl font-bold md:text-5xl lg:text-6xl xl:text-8xl">
         Security <br />
         you can't see... <br />
         but always trust
