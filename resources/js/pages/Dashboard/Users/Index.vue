@@ -45,6 +45,10 @@
     phone: string;
     reports_count: number;
     country: string;
+    ownership_number: string;
+    company_name: string;
+    national_id_number: string;
+    product_type: string;
   }
 
   const { users: data = [] } = defineProps<{
@@ -74,31 +78,29 @@
       enableGlobalFilter: true,
     }),
     columnHelper.accessor('email', {
-      header: ({ column }) => {
-        return h(
+      header: ({ column }) =>
+        h(
           Button,
           {
             variant: 'ghost',
             onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
           },
           () => ['Email', h(ChevronsUpDown, { class: 'ml-2 h-4 w-4' })],
-        );
-      },
+        ),
       cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('email')),
       enableColumnFilter: true,
       enableGlobalFilter: true,
     }),
     columnHelper.accessor('name', {
-      header: ({ column }) => {
-        return h(
+      header: ({ column }) =>
+        h(
           Button,
           {
             variant: 'ghost',
             onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
           },
           () => ['Name', h(ChevronsUpDown, { class: 'ml-2 h-4 w-4' })],
-        );
-      },
+        ),
       cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('name')),
       enableColumnFilter: true,
       enableGlobalFilter: true,
@@ -112,6 +114,30 @@
     columnHelper.accessor('country', {
       header: 'Country',
       cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('country')),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
+    }),
+    columnHelper.accessor('ownership_number', {
+      header: 'Ownership No.',
+      cell: ({ row }) => h('div', {}, row.getValue('ownership_number')),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
+    }),
+    columnHelper.accessor('company_name', {
+      header: 'Company Name',
+      cell: ({ row }) => h('div', {}, row.getValue('company_name')),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
+    }),
+    columnHelper.accessor('national_id_number', {
+      header: 'National ID',
+      cell: ({ row }) => h('div', {}, row.getValue('national_id_number')),
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
+    }),
+    columnHelper.accessor('product_type', {
+      header: 'Product Type',
+      cell: ({ row }) => h('div', {}, row.getValue('product_type')),
       enableColumnFilter: true,
       enableGlobalFilter: true,
     }),

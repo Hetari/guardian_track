@@ -32,12 +32,16 @@
     country: '',
     password: '',
     password_confirmation: '',
+    ownership_number: '',
+    company_name: '',
+    national_id_number: '',
+    product_type: '',
   });
 
   const submit = () => {
     form.phone = form.phone.toString();
     form.post(route('register'), {
-      // onFinish: () => form.reset('password', 'password_confirmation'),
+      onFinish: () => form.reset('password', 'password_confirmation'),
     });
   };
 </script>
@@ -101,6 +105,30 @@
             placeholder="Confirm password"
           />
           <InputError :message="form.errors.password_confirmation" />
+        </div>
+
+        <div class="grid gap-2">
+          <Label for="ownership_number">Ownership Number</Label>
+          <Input id="ownership_number" type="text" v-model="form.ownership_number" placeholder="Ownership Number" />
+          <InputError :message="form.errors.ownership_number" />
+        </div>
+
+        <div class="grid gap-2">
+          <Label for="company_name">Company Name</Label>
+          <Input id="company_name" type="text" v-model="form.company_name" placeholder="Company Name" />
+          <InputError :message="form.errors.company_name" />
+        </div>
+
+        <div class="grid gap-2">
+          <Label for="national_id_number">National ID Number</Label>
+          <Input id="national_id_number" type="text" v-model="form.national_id_number" placeholder="National ID Number" />
+          <InputError :message="form.errors.national_id_number" />
+        </div>
+
+        <div class="grid gap-2">
+          <Label for="product_type">Product Type</Label>
+          <Input id="product_type" type="text" v-model="form.product_type" placeholder="e.g. Laptop, Phone" />
+          <InputError :message="form.errors.product_type" />
         </div>
 
         <Button type="submit" class="col-span-2 mt-2 w-full" tabindex="5" :disabled="form.processing">

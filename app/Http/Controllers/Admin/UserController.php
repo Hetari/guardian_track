@@ -26,6 +26,10 @@ class UserController extends Controller
             'email' => 'required|email',
             'phone' => 'required|string|max:255',
             'country' => 'required|string|max:255',
+            'ownership_number' => 'required|string|max:255',
+            'company_name' => 'required|string|max:255',
+            'national_id_number' => 'required|string|max:255',
+            'product_type' => 'required|string|max:255',
         ]);
 
         $user = User::find($validated['id']);

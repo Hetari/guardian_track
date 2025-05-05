@@ -32,21 +32,19 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'phone' => 'required|string|max:255',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'country' => 'required|string|max:255',
+            'ownership_number' => 'required|string|max:255',
+            'company_name' => 'required|string|max:255',
+            'national_id_number' => 'required|string|max:255',
+            'product_type' => 'required|string|max:255',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'country' => $request->country,
-        ]);
+        $user = User::create($data);
 
         // Generate the signed URL for email verification
         $verificationUrl = URL::temporarySignedRoute(

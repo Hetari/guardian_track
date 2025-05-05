@@ -61,6 +61,46 @@
                     <FormMessage />
                   </FormItem>
                 </FormField>
+
+                <FormField v-slot="{ componentField }" name="ownership_number">
+                  <FormItem>
+                    <FormLabel>Ownership Number</FormLabel>
+                    <FormControl>
+                      <Input type="text" v-model="user.ownership_number" v-bind="componentField.modelValue" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+
+                <FormField v-slot="{ componentField }" name="company_name">
+                  <FormItem>
+                    <FormLabel>Company Name</FormLabel>
+                    <FormControl>
+                      <Input type="text" v-model="user.company_name" v-bind="componentField.modelValue" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+
+                <FormField v-slot="{ componentField }" name="national_id_number">
+                  <FormItem>
+                    <FormLabel>National ID Number</FormLabel>
+                    <FormControl>
+                      <Input type="text" v-model="user.national_id_number" v-bind="componentField.modelValue" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+
+                <FormField v-slot="{ componentField }" name="product_type">
+                  <FormItem>
+                    <FormLabel>Product Type</FormLabel>
+                    <FormControl>
+                      <Input type="text" v-model="user.product_type" v-bind="componentField.modelValue" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
               </template>
               <template v-else-if="action.name.toLowerCase() === 'delete'">
                 <p class="text-red-500">Are you sure you want to delete this user?</p>
@@ -97,10 +137,32 @@
       email: z.string().email(),
       phone: z.string().optional(),
       country: z.string().optional(),
+      ownership_number: z.string().optional(),
+      company_name: z.string().optional(),
+      national_id_number: z.string().optional(),
+      product_type: z.string().optional(),
     }),
   );
 
-  const user = ref<{ name: string; email: string; phone?: string; country: string }>({ name: '', email: '', phone: '', country: '' });
+  const user = ref<{
+    name: string;
+    email: string;
+    phone?: string;
+    country: string;
+    ownership_number?: string;
+    company_name?: string;
+    national_id_number?: string;
+    product_type?: string;
+  }>({
+    name: '',
+    email: '',
+    phone: '',
+    country: '',
+    ownership_number: '',
+    company_name: '',
+    national_id_number: '',
+    product_type: '',
+  });
 
   const { actions = [] } = defineProps<{
     actions: {
