@@ -24,8 +24,8 @@
         <Link
           v-if="is_authenticated"
           class="rounded-full bg-[#222] px-3 py-2 md:px-6"
-          :href="auth?.user?.role === 'admin' ? route('dashboard.reports.index') : route('reports.index')"
-          >reports</Link
+          :href="auth?.user?.role === 'admin' ? route('dashboard.index') : route('reports.index')"
+          >{{ auth?.user?.role === 'admin' ? 'Dashboard' : 'Report' }}</Link
         >
       </div>
     </header>
