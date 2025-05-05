@@ -130,6 +130,8 @@
         toast({ title: 'Success', description: 'Report submitted.' });
       },
       onError: (formErrors) => {
+        console.log(formErrors);
+
         errors.value = formErrors;
         toast({ title: 'Error', description: formErrors.message });
       },
@@ -153,13 +155,13 @@
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
       <div>
         <Label for="customer_name">Customer Name</Label>
-        <Input id="customer_name" v-model="customerName" placeholder="Enter customer name" :class="{ 'border-red-500': errors.customerName }" />
-        <span v-if="errors.customerName" class="text-sm text-red-500">{{ errors.customerName }}</span>
+        <Input id="customer_name" v-model="customerName" placeholder="Enter customer name" :class="{ 'border-red-500': errors.customer_name }" />
+        <span v-if="errors.customer_name" class="text-sm text-red-500">{{ errors.customer_name }}</span>
       </div>
       <div>
         <Label for="serial_code">Serial Code</Label>
         <Input id="serial_code" v-model="serialCode" placeholder="Enter serial code" :class="{ 'border-red-500': errors.serial_code }" />
-        <span v-if="errors.serialCode" class="text-sm text-red-500">{{ errors.serialCode }}</span>
+        <span v-if="errors.serial_code" class="text-sm text-red-500">{{ errors.serial_code }}</span>
       </div>
       <div>
         <Label for="date_time">Stolen Date</Label>
@@ -172,7 +174,7 @@
             }
           "
         /> -->
-        <span v-if="errors.dateTime" class="text-sm text-red-500">{{ errors.dateTime }}</span>
+        <span v-if="errors.date_time" class="text-sm text-red-500">{{ errors.date_time }}</span>
       </div>
       <div>
         <Label for="country">Country</Label>
@@ -186,8 +188,8 @@
       </div>
       <div>
         <Label for="street_address">Street Address</Label>
-        <Input id="street_address" v-model="streetAddress" placeholder="Enter street address" :class="{ 'border-red-500': errors.streetAddress }" />
-        <span v-if="errors.streetAddress" class="text-sm text-red-500">{{ errors.streetAddress }}</span>
+        <Input id="street_address" v-model="streetAddress" placeholder="Enter street address" :class="{ 'border-red-500': errors.street_address }" />
+        <span v-if="errors.street_address" class="text-sm text-red-500">{{ errors.street_address }}</span>
       </div>
       <div>
         <Label for="company">Company</Label>
@@ -205,7 +207,7 @@
       </div>
       <div>
         <Label for="item_type">Item Type</Label>
-        <Select id="item_type" v-model="itemType" :class="{ 'border-red-500': errors.itemType }">
+        <Select id="item_type" v-model="itemType" :class="{ 'border-red-500': errors.item_type }">
           <SelectTrigger>
             <SelectValue placeholder="Select item" />
           </SelectTrigger>
@@ -215,12 +217,12 @@
             </SelectGroup>
           </SelectContent>
         </Select>
-        <span v-if="errors.itemType" class="text-sm text-red-500">{{ errors.itemType }}</span>
+        <span v-if="errors.item_type" class="text-sm text-red-500">{{ errors.item_type }}</span>
       </div>
       <div>
         <Label for="id_card_image">Upload ID Card</Label>
-        <Input id="id_card_image" type="file" accept="image/*" @change="handleIdCardImage" :class="{ 'border-red-500': errors.idCardImage }" />
-        <span v-if="errors.idCardImage" class="text-sm text-red-500">{{ errors.idCardImage }}</span>
+        <Input id="id_card_image" type="file" accept="image/*" @change="handleIdCardImage" :class="{ 'border-red-500': errors.id_card_image }" />
+        <span v-if="errors.id_card_image" class="text-sm text-red-500">{{ errors.id_card_image }}</span>
       </div>
       <div>
         <Label for="ownership_document">Upload Ownership Document</Label>
@@ -229,7 +231,7 @@
           type="file"
           accept="image/*"
           @change="handleOwnershipDocument"
-          :class="{ 'border-red-500': errors.ownershipDocument }"
+          :class="{ 'border-red-500': errors.ownership_document }"
           :disabled="lostOwnershipDocument"
         />
 
@@ -237,7 +239,7 @@
           <input type="checkbox" id="lost_ownership_document" v-model="lostOwnershipDocument" class="mr-2" />
           <Label for="lost_ownership_document">I have lost the ownership document</Label>
         </div>
-        <span v-if="errors.ownershipDocument" class="text-sm text-red-500">{{ errors.ownershipDocument }}</span>
+        <span v-if="errors.ownership_document" class="text-sm text-red-500">{{ errors.ownership_document }}</span>
       </div>
       <div
         class="flex flex-col justify-center"
