@@ -10,7 +10,9 @@
           </DialogTrigger>
           <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>{{ action.name.toLowerCase() === 'delete' ? 'Delete Report' : 'Update Status' }}</DialogTitle>
+              <DialogTitle>{{
+                action.name.toLowerCase() === 'delete' ? 'Delete Report' : action.name.toLowerCase() === 'edit' ? 'Update Status' : 'Save PDF'
+              }}</DialogTitle>
               <DialogDescription>
                 {{
                   action.name === 'delete'
@@ -46,11 +48,15 @@
                 <p class="mt-4 font-medium text-red-500">Are you sure you want to delete this user?</p>
                 <p class="text-red-500">This action cannot be undone.</p>
               </template>
+
+              <template v-else-if="action.name.toLowerCase() === 'share as pdf'">
+                <p class="mt-4">Click "Share" to download or view the report as PDF.</p>
+              </template>
             </form>
 
             <DialogFooter>
               <Button type="submit" form="dialogForm">
-                {{ action.name.toLowerCase() === 'delete' ? 'Delete' : 'Save' }}
+                {{ action.name.toLowerCase() === 'delete' ? 'Delete' : action.name.toLowerCase() === 'share as pdf' ? 'Share' : 'Save' }}
               </Button>
             </DialogFooter>
           </DialogContent>

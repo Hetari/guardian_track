@@ -8,6 +8,7 @@ use App\Models\Upload;
 use App\Models\PartnerCompany;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
@@ -132,6 +133,12 @@ class ReportController extends Controller
         $report = Report::findOrFail($id);
         $report->delete();
         return redirect()->route('reports.status')->with('success', 'Report deleted successfully');
+    }
+
+    public function exportPdf(Report $report)
+    {
+        $pdf = PDF::loadView('pdf.report', compact('report')); // blade file for report design
+        return $pdf->download("report-{$report->id}.pdf");
     }
 
     private function storeBase64Image($base64Image)

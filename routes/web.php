@@ -41,6 +41,9 @@ Route::group(['middleware' => ['auth', 'verified', 'admin'], 'as' => 'dashboard.
         Route::get('/', [ReportManagementController::class, 'index'])->name('index');
         Route::post('/edit', [ReportManagementController::class, 'edit'])->name('edit');
         Route::delete('/delete/{id}', [ReportManagementController::class, 'delete'])->name('delete');
+
+        // pdf
+        Route::get('/{report}/export-pdf', [ReportController::class, 'exportPdf']);
     });
 });
 

@@ -5,7 +5,7 @@
   import { type BreadcrumbItem } from '@/types';
   import { Head, router } from '@inertiajs/vue3';
   import type { ColumnFiltersState, ExpandedState, SortingState, VisibilityState } from '@tanstack/vue-table';
-  import { PenIcon, Trash } from 'lucide-vue-next';
+  import { Forward, PenIcon, Trash } from 'lucide-vue-next';
 
   import { Checkbox } from '@/components/ui/checkbox';
   import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -203,6 +203,16 @@
             icon: Trash,
             onSubmit: () => {
               router.delete(`/dashboard/reports/delete/${row.original.id}`);
+            },
+            row: row.original,
+          },
+          {
+            name: 'Share as PDF',
+            icon: Forward,
+            onSubmit: () => {
+              const reportId = row.original.id;
+              // Either download directly or open in new tab
+              window.open(`/dashboard/reports/${reportId}/export-pdf`, '_blank');
             },
             row: row.original,
           },
