@@ -26,6 +26,6 @@ class VerifyEmailController extends Controller
 
         $request->session()->regenerate();
         auth()->login($request->user(), remember: true);
-        return redirect()->intended(route('verification.success', absolute: false) . '?verified=1');
+        return redirect()->intended(route('home', absolute: false) . '?verified=1');
     }
 }
