@@ -5,7 +5,7 @@
   import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
   import { type NavItem } from '@/types';
   import { Link } from '@inertiajs/vue3';
-  import { Barcode, Building2, LayoutGrid, NotepadText, Users } from 'lucide-vue-next';
+  import { Armchair, Barcode, Building2, LayoutGrid, NotepadText, Users } from 'lucide-vue-next';
   import AppLogo from './AppLogo.vue';
 
   const mainNavItems: NavItem[] = [
@@ -29,6 +29,12 @@
       href: '/dashboard/companies',
       icon: Building2,
     },
+    {
+      title: 'Products',
+      href: '/dashboard/products',
+      icon: Armchair,
+    },
+
     {
       title: 'Serial Numbers',
       href: '/dashboard/serial-numbers',
