@@ -17,6 +17,11 @@
   }
   const { companies = [] } = defineProps<{
     companies: Company[];
+    products: {
+      id: string;
+      name: string;
+      active: boolean;
+    }[];
   }>();
 
   const customerName = ref('');
@@ -212,7 +217,7 @@
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem v-for="item in ['Bag', 'Shoe', 'Watch', 'Other']" :key="item" :value="item"> {{ item }} </SelectItem>
+              <SelectItem v-for="item in products" :key="item.id" :value="item.name"> {{ item.name }} </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>

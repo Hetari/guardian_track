@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Report;
 use App\Models\Upload;
 use App\Models\PartnerCompany;
+use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -19,16 +20,20 @@ class ReportController extends Controller
     public function lost()
     {
         $companies = PartnerCompany::all();
+        $products = Product::all();
         return Inertia::render('Reports/Lost', [
             'companies' => $companies,
+            'products' => $products,
         ]);
     }
 
     public function stolen()
     {
         $companies = PartnerCompany::all();
+        $products = Product::all();
         return Inertia::render('Reports/Stolen', [
             'companies' => $companies,
+            'products' => $products,
         ]);
     }
 
