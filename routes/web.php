@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ReportManagementController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SerialNumberController;
 use Illuminate\Support\Facades\Route;
 
 // Home
@@ -51,6 +53,20 @@ Route::group(['middleware' => ['auth', 'verified', 'admin'], 'as' => 'dashboard.
         Route::post('/create', [CompanyController::class, 'create'])->name('create');
         Route::post('/edit', [CompanyController::class, 'edit'])->name('edit');
         Route::delete('/delete/{id}', [CompanyController::class, 'delete'])->name('delete');
+    });
+
+    Route::group(['prefix' => 'dashboard/serial-numbers', 'as' => 'serial-numbers.'], function () {
+        Route::get('/', [SerialNumberController::class, 'index'])->name('index');
+        Route::post('/store', [SerialNumberController::class, 'store'])->name('store');
+        Route::post('/update/{serialNumber}', [SerialNumberController::class, 'update'])->name('update');
+        Route::delete('/delete/{serialNumber}', [SerialNumberController::class, 'destroy'])->name('delete');
+    });
+
+    Route::group(['prefix' => 'dashboard/products', 'as' => 'products.'], function () {
+        Route::get('/', [ProductController::class, 'index'])->name('index');
+        Route::post('/create', [ProductController::class, 'store'])->name('create');
+        Route::post('/edit/{product}', [ProductController::class, 'update'])->name('edit');
+        Route::delete('/delete/{product}', [ProductController::class, 'destroy'])->name('delete');
     });
 });
 
