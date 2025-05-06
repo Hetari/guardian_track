@@ -6,6 +6,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ReportManagementController;
+use App\Http\Controllers\CompanyController;
 use Illuminate\Support\Facades\Route;
 
 // Home
@@ -41,9 +42,15 @@ Route::group(['middleware' => ['auth', 'verified', 'admin'], 'as' => 'dashboard.
         Route::get('/', [ReportManagementController::class, 'index'])->name('index');
         Route::post('/edit', [ReportManagementController::class, 'edit'])->name('edit');
         Route::delete('/delete/{id}', [ReportManagementController::class, 'delete'])->name('delete');
-
         // pdf
         Route::get('/{report}/export-pdf', [ReportController::class, 'exportPdf']);
+    });
+
+    Route::group(['prefix' => 'dashboard/companies', 'as' => 'companies.'], function () {
+        Route::get('/', [CompanyController::class, 'index'])->name('index');
+        Route::post('/create', [CompanyController::class, 'create'])->name('create');
+        Route::post('/edit', [CompanyController::class, 'edit'])->name('edit');
+        Route::delete('/delete/{id}', [CompanyController::class, 'delete'])->name('delete');
     });
 });
 
