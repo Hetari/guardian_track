@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('purchase_location');
 
             // TODO: another table for this and fk
-            $table->enum('item_type', ['Bag', 'Shoe', 'Watch', 'Other']);
+            $table->string('item_type');
             $table->enum('status', ['received', 'checking_brand', 'checking_company', 'transferred_to_police', 'done'])->default('received');
             $table->timestamps();
         });
