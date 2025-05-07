@@ -34,7 +34,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
         $user = auth()->user();
 
-        if (is_null($user->email_verified_at) && $user->hasVerifiedEmail()) {
+        if (!$user->hasVerifiedEmail()) {
             return redirect()->route('verification.notice');
         }
 
