@@ -88,11 +88,7 @@ class ReportController extends Controller
             'id_card_image' => 'nullable|file|mimes:jpg,png,pdf,webp',
         ]);
 
-        if (empty($data['tracking_code'])) {
-            $data['tracking_code'] = uniqid('report_');
-        }
-
-
+        $data['tracking_code'] = uniqid('report_');
         $data['user_id'] = auth()->id();
         if (!$data['user_id']) {
             return redirect()->route('login');
