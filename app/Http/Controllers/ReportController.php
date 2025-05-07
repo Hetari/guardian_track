@@ -86,10 +86,8 @@ class ReportController extends Controller
             'lost_ownership_document' => 'boolean',
             'files.*' => 'nullable|file|mimes:jpg,png,pdf,webp',
             'id_card_image' => 'nullable|file|mimes:jpg,png,pdf,webp',
-            'tracking_code' => 'nullable|string|unique:reports,tracking_code',
         ]);
 
-        // TODO: if there is no tracking_code generate it
         if (empty($data['tracking_code'])) {
             $data['tracking_code'] = uniqid('report_');
         }

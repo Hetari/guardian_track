@@ -19,7 +19,6 @@ class Report extends Model
         'status',
         'company_id',
         'lost_ownership_document',
-        'tracking_code',
     ];
     protected $casts = [
         'date_time' => 'datetime',

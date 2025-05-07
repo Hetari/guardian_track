@@ -44,7 +44,15 @@
 
     if (!customerName.value) {
       errors.value.customerName = 'Required';
-      errors.value.serialCode = 'Required';
+      isValid = false;
+    }
+
+    if (!customerName.value) {
+      errors.value.customer_name = 'Required';
+      isValid = false;
+    }
+    if (!serialCode.value) {
+      errors.value.serial_code = 'Required';
       isValid = false;
     }
 
@@ -159,26 +167,28 @@
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
       <div>
         <Label for="customer_name">Customer Name</Label>
-        <Input id="customer_name" v-model="customerName" placeholder="Enter customer name" :class="{ 'border-red-500': errors.customer_name }" />
-        <span v-if="errors.customer_name" class="text-sm text-red-500">{{ errors.customer_name }}</span>
+        <Input
+          id="customer_name"
+          v-model="customerName"
+          placeholder="Enter customer name"
+          :class="{ 'border-red-500': errors.customer_name || errors.customerName }"
+        />
+        <span v-if="errors.customer_name || errors.customerName" class="text-sm text-red-500">{{ errors.customer_name || errors.customerName }}</span>
       </div>
       <div>
         <Label for="serial_code">Serial Code</Label>
-        <Input id="serial_code" v-model="serialCode" placeholder="Enter serial code" :class="{ 'border-red-500': errors.serial_code }" />
-        <span v-if="errors.serial_code" class="text-sm text-red-500">{{ errors.serial_code }}</span>
+        <Input
+          id="serial_code"
+          v-model="serialCode"
+          placeholder="Enter serial code"
+          :class="{ 'border-red-500': errors.serial_code || errors.serialCode }"
+        />
+        <span v-if="errors.serial_code || errors.serialCode" class="text-sm text-red-500">{{ errors.serial_code || errors.serialCode }}</span>
       </div>
       <div>
         <Label for="date_time">Lost Date</Label>
         <InputDatePicker class="w-full" v-model="dateTime" placeholder="Enter the date and time" />
-        <!-- <DatePicker
-          :value="dateTime"
-          @modelValue="
-            (val: any) => {
-              dateTime = val;
-            }
-          "
-        /> -->
-        <span v-if="errors.date_time" class="text-sm text-red-500">{{ errors.date_time }}</span>
+        <span v-if="errors.date_time || errors.dateTime" class="text-sm text-red-500">{{ errors.date_time || errors.dateTime }}</span>
       </div>
       <div>
         <Label for="country">Country</Label>
@@ -192,12 +202,19 @@
       </div>
       <div>
         <Label for="street_address">Street Address</Label>
-        <Input id="street_address" v-model="streetAddress" placeholder="Enter street address" :class="{ 'border-red-500': errors.street_address }" />
-        <span v-if="errors.street_address" class="text-sm text-red-500">{{ errors.street_address }}</span>
+        <Input
+          id="street_address"
+          v-model="streetAddress"
+          placeholder="Enter street address"
+          :class="{ 'border-red-500': errors.street_address || errors.streetAddress }"
+        />
+        <span v-if="errors.street_address || errors.streetAddress" class="text-sm text-red-500">{{
+          errors.street_address || errors.streetAddress
+        }}</span>
       </div>
       <div>
         <Label for="company">Company</Label>
-        <Select id="company" v-model="companyId" :class="{ 'border-red-500': errors.company }">
+        <Select id="company" v-model="companyId" :class="{ 'border-red-500': errors.company_id || errors.companyId }">
           <SelectTrigger>
             <SelectValue placeholder="Select company" />
           </SelectTrigger>
@@ -207,11 +224,11 @@
             </SelectGroup>
           </SelectContent>
         </Select>
-        <span v-if="errors.company" class="text-sm text-red-500">{{ errors.company }}</span>
+        <span v-if="errors.company_id || errors.companyId" class="text-sm text-red-500">{{ errors.company_id || errors.companyId }}</span>
       </div>
       <div>
         <Label for="item_type">Item Type</Label>
-        <Select id="item_type" v-model="itemType" :class="{ 'border-red-500': errors.item_type }">
+        <Select id="item_type" v-model="itemType" :class="{ 'border-red-500': errors.item_type || errors.itemType }">
           <SelectTrigger>
             <SelectValue placeholder="Select item" />
           </SelectTrigger>
@@ -221,12 +238,18 @@
             </SelectGroup>
           </SelectContent>
         </Select>
-        <span v-if="errors.item_type" class="text-sm text-red-500">{{ errors.item_type }}</span>
+        <span v-if="errors.item_type || errors.itemType" class="text-sm text-red-500">{{ errors.item_type || errors.itemType }}</span>
       </div>
       <div>
         <Label for="id_card_image">Upload ID Card</Label>
-        <Input id="id_card_image" type="file" accept="image/*" @change="handleIdCardImage" :class="{ 'border-red-500': errors.id_card_image }" />
-        <span v-if="errors.id_card_image" class="text-sm text-red-500">{{ errors.id_card_image }}</span>
+        <Input
+          id="id_card_image"
+          type="file"
+          accept="image/*"
+          @change="handleIdCardImage"
+          :class="{ 'border-red-500': errors.id_card_image || errors.idCardImage }"
+        />
+        <span v-if="errors.id_card_image || errors.idCardImage" class="text-sm text-red-500">{{ errors.id_card_image || errors.idCardImage }}</span>
       </div>
       <div>
         <Label for="ownership_document">Upload Ownership Document</Label>
@@ -235,7 +258,7 @@
           type="file"
           accept="image/*"
           @change="handleOwnershipDocument"
-          :class="{ 'border-red-500': errors.ownership_document }"
+          :class="{ 'border-red-500': errors.ownership_document || errors.ownershipDocument }"
           :disabled="lostOwnershipDocument"
         />
 
@@ -243,7 +266,9 @@
           <input type="checkbox" id="lost_ownership_document" v-model="lostOwnershipDocument" class="mr-2" />
           <Label for="lost_ownership_document">I have lost the ownership document</Label>
         </div>
-        <span v-if="errors.ownership_document" class="text-sm text-red-500">{{ errors.ownership_document }}</span>
+        <span v-if="errors.ownership_document || errors.ownershipDocument" class="text-sm text-red-500">{{
+          errors.ownership_document || errors.ownershipDocument
+        }}</span>
       </div>
       <div
         class="flex flex-col justify-center"
