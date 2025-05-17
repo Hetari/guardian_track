@@ -19,8 +19,11 @@ class Report extends Model
         'status',
         'company_id',
         'lost_ownership_document',
-        'tracking_code',
+        'latitude',   // ✅ مضاف حديثًا
+        'longitude',  // ✅ مضاف حديثًا
+        'tracking_code', // ✅ مضاف إذا لم يكن موجود سابقًا
     ];
+
     protected $casts = [
         'date_time' => 'datetime',
         'lost_ownership_document' => 'boolean',
@@ -30,10 +33,12 @@ class Report extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     public function company()
     {
         return $this->belongsTo(PartnerCompany::class, 'company_id');
     }
+
     public function uploads()
     {
         return $this->hasMany(Upload::class);

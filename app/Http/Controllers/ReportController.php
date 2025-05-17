@@ -17,6 +17,7 @@ class ReportController extends Controller
     {
         return Inertia::render('Reports/Index');
     }
+
     public function lost()
     {
         $companies = PartnerCompany::all();
@@ -39,12 +40,38 @@ class ReportController extends Controller
 
     public function submitted($tracking_code)
     {
-        dd($tracking_code);
         return Inertia::render('Reports/Submitted', [
             'tracking_code' => $tracking_code,
         ]);
     }
 
+    public function tracking($tracking_code)
+    {
+        $report = Report::where('tracking_code', $tracking_code)->first();
+
+        if (!$report) {
+            abort(404);
+        }
+
+        return Inertia::render('Reports/TrackingPage', [
+            'tracking_code' => $tracking_code,
+            'report' => $report,
+        ]);
+    }
+
+    public function liveTracking($trackingCode)
+    {
+        $report = Report::where('tracking_code', $trackingCode)->first();
+
+        if (!$report) {
+            abort(404);
+        }
+
+        return Inertia::render('Dashboard/Reports/LiveTracking', [
+            'trackingCode' => $trackingCode,
+            'report' => $report,
+        ]);
+    }
     public function status()
     {
         $status = [
@@ -56,9 +83,7 @@ class ReportController extends Controller
         ];
 
         $currentUser = auth()->user();
-        $reports = $currentUser->reports()
-            ->with(['company'])
-            ->get();
+        $reports = $currentUser->reports()->with(['company'])->get();
 
         return Inertia::render('Reports/Status', [
             'reports' => $reports,
@@ -68,7 +93,6 @@ class ReportController extends Controller
 
     public function store(Request $request)
     {
-
         $request->merge([
             'date_time' => preg_replace('/\s*\(.*\)$/', '', $request->input('date_time')),
         ]);
@@ -77,45 +101,52 @@ class ReportController extends Controller
             'type' => 'required|in:stolen,lost',
             'customer_name' => 'required|string|max:255',
             'serial_code' => 'required|string',
-            'item_type' => 'required|in:Bag,Shoe,Watch,Other',
+            'item_type' => 'required|string|max:255',
             'date_time' => 'required|date|before:now',
             'country' => 'required|string',
             'city' => 'required|string',
             'street_address' => 'required|string',
             'company_id' => 'nullable|exists:partner_companies,id',
             'lost_ownership_document' => 'boolean',
+
+            //  إضافة دعم للإحداثيات
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+
             'files.*' => 'nullable|file|mimes:jpg,png,pdf,webp',
             'id_card_image' => 'nullable|file|mimes:jpg,png,pdf,webp',
         ]);
 
         $data['tracking_code'] = uniqid('report_');
         $data['user_id'] = auth()->id();
+
         if (!$data['user_id']) {
             return redirect()->route('login');
         }
 
-
         $report = Report::create($data);
+
         if (!$report) {
             return response()->json(['message' => 'Failed to create report'], 500);
         }
 
-
+        // صورة الهوية
         if ($request->hasFile('id_card_image')) {
             $path = $request->file('id_card_image')->store('uploads', 'public');
             Upload::create([
-                'file_path' => $path,
+                'file_path' => 'storage/' . $path,
                 'report_id' => $report->id,
                 'file_type' => 'id_card'
             ]);
         }
 
+        // الملفات الأخرى
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
-                $filePath = 'storage/' . $file->store('uploads', 'public');
+                $filePath = $file->store('uploads', 'public');
                 Upload::create([
                     'report_id' => $report->id,
-                    'file_path' => $filePath,
+                    'file_path' => 'storage/' . $filePath,
                     'file_type' => 'product',
                 ]);
             }
@@ -126,7 +157,6 @@ class ReportController extends Controller
         ]);
     }
 
-
     public function destroy($id)
     {
         $report = Report::findOrFail($id);
@@ -136,7 +166,7 @@ class ReportController extends Controller
 
     public function exportPdf(Report $report)
     {
-        $pdf = PDF::loadView('pdf.report', compact('report')); // blade file for report design
+        $pdf = PDF::loadView('pdf.report', compact('report'));
         return $pdf->download("report-{$report->id}.pdf");
     }
 

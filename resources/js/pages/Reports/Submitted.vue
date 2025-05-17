@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { Button } from '@/components/ui/button';
   import { Toaster, useToast } from '@/components/ui/toast';
-  import { Link, usePage } from '@inertiajs/vue3';
+  import { Link, router, usePage } from '@inertiajs/vue3';
   import { ref } from 'vue';
 
   const { toast } = useToast();
@@ -16,6 +16,11 @@
         description: 'Tracking code has been copied to clipboard.',
       });
     });
+  }
+
+  function navigateToTracking() {
+    console.log('Navigating to tracking page...', trackingCode);
+    router.visit(`/reports/tracking/${trackingCode}`);
   }
 </script>
 
@@ -40,6 +45,9 @@
           </Button>
         </div>
         <p class="text-sm text-red-600 dark:text-red-500">Please <b>save</b> it to follow up on your report status later.</p>
+        <div class="mt-6">
+          <Button @click="navigateToTracking"> Go to Tracking Page </Button>
+        </div>
       </div>
     </div>
   </section>

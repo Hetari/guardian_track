@@ -26,7 +26,9 @@ class ReportManagementController extends Controller
                 'status',
                 'company_id',
                 'lost_ownership_document',
-                'tracking_code'
+                'tracking_code',
+                'latitude',          
+                'longitude'
             )
             ->latest('created_at')
             ->get();

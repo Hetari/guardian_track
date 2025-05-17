@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Http\Controllers\HomeController;
@@ -10,6 +9,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SerialNumberController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TrackingController;
 
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -20,14 +20,19 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'reports', 'as' 
     Route::get('/lost', [ReportController::class, 'lost'])->name('lost');
     Route::get('/stolen', [ReportController::class, 'stolen'])->name('stolen');
     Route::get('/submitted/{tracking_code}', [ReportController::class, 'submitted'])->name('submitted');
+     Route::get('/tracking/{tracking_code}', [ReportController::class, 'tracking'])->name('tracking');
     Route::delete('/delete/{id}', [ReportController::class, 'destroy'])->name('delete');
 
     Route::group(['prefix' => 'items'], function () {
         Route::post('/stolen', [ReportController::class, 'store'])->name('stolen.store');
         Route::post('/lost', [ReportController::class, 'store'])->name('lost.store');
+        Route::post('/save-tracking', [TrackingController::class, 'store'])->name('items.save-tracking');
+        Route::get('/live-tracking/{trackingCode}/location', [TrackingController::class, 'latestLocation'])->name('items.live-tracking.location');
     });
 
     Route::get('/status', [ReportController::class, 'status'])->name('status');
+
+    Route::get('/live-tracking/{trackingCode}', [ReportController::class, 'liveTracking'])->name('live-tracking');
 });
 
 // Admin Dashboard
